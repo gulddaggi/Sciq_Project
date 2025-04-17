@@ -1,0 +1,74 @@
+# =============================
+# OS
+# =============================
+.DS_Store
+Thumbs.db
+
+# =============================
+# IDE & Editor
+# =============================
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+*.sublime-project
+*.sublime-workspace
+
+# =============================
+# Java / Spring Boot / Gradle
+# =============================
+# Gradle wrapper files
+gradlew
+gradlew.bat
+gradle/wrapper/gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper.properties
+
+# Gradle caches and build outputs
+.gradle/
+**/build/
+**/out/
+
+# Compiled class files
+**/*.class
+
+# Executable jar/war files
+**/*.jar
+**/*.war
+
+# Spring Boot specific error logs
+hs_err_pid*
+
+# =============================
+# Node / Vue.js Frontend
+# =============================
+node_modules/
+dist/
+build/
+.vite/
+temp/
+
+# npm logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =============================
+# Environment & Configuration
+# =============================
+.env
+.env.*
+
+# =============================
+# Docker
+# =============================
+docker-compose.override.yml
+docker-compose.*.yml
+Dockerfile
+
+# =============================
+# Miscellaneous
+# =============================n*.swp
+*~
+

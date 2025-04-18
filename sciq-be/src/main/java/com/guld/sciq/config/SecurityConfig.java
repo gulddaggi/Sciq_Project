@@ -92,7 +92,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:5173"); // 프론트엔드 URL
+        configuration.addAllowedOrigin("http://localhost:5173"); // 프론트엔드 개발 URL
+        configuration.addAllowedOrigin("http://www.sciq.co.kr"); // 프로덕션 URL
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'http://nstgic2.cafe24.com/api',
+  baseURL: 'http://api.sciq.co.kr',
   headers: {
     'Content-Type': 'application/json',
   },

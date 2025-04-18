@@ -1,0 +1,73 @@
+name: Full Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  frontend:
+    name: Deploy Frontend to S3
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout frontend code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  # ← 프로젝트에 맞게 수정
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./sciq-fe
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: ./sciq-fe
+
+      - name: Deploy to S3
+        uses: jakejarvis/s3-sync-action@v0.5.1
+        with:
+          args: --acl public-read --delete
+        env:
+          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          SOURCE_DIR: ./sciq-fe/dist
+
+  backend:
+    name: Deploy Backend to EC2
+    runs-on: ubuntu-latest
+    needs: frontend  # 프론트가 끝나고 실행됨
+
+    steps:
+      - name: Checkout backend code
+        uses: actions/checkout@v3
+
+      - name: Zip backend source
+        run: zip -r sciq-be.zip sciq-be
+
+      - name: Copy to EC2
+        uses: appleboy/scp-action@v0.1.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          source: "sciq-be.zip"
+          target: "~/"
+
+      - name: Deploy on EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            unzip -o ~/sciq-be.zip -d ~/sciq-be
+            cd ~/sciq-be
+            sudo docker-compose down
+            sudo docker-compose build --no-cache
+            sudo docker-compose up -d

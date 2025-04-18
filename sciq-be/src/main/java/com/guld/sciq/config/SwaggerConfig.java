@@ -28,7 +28,7 @@ public class SwaggerConfig {
                                 .bearerFormat("JWT")))
                 .addSecurityItem(new SecurityRequirement().addList("Bearer"))
                 .servers(List.of(
-                        new Server().url("http://nstgic2.cafe24.com/api").description("Production server"),
+                        new Server().url("http://api.sciq.co.kr").description("Production server"),
                         new Server().url("http://localhost:8080").description("localhost")));
     }
 }

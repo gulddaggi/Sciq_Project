@@ -30,7 +30,7 @@ export const questionService = {
   // 인기 질문 목록 조회
   async getPopularQuestions() {
     try {
-      const response = await axios.get<ApiResponse<QuestionListResponse>>('/questions/popular');
+      const response = await axios.get<ApiResponse<QuestionListResponse>>('/v1/questions/popular');
       return response.data.response;
     } catch (error) {
       console.error('인기 질문 조회 실패:', error);
@@ -41,7 +41,7 @@ export const questionService = {
   // 최신 질문 목록 조회
   async getRecentQuestions() {
     try {
-      const response = await axios.get<ApiResponse<QuestionListResponse>>('/questions/recent');
+      const response = await axios.get<ApiResponse<QuestionListResponse>>('/v1/questions/recent');
       return response.data.response;
     } catch (error) {
       console.error('최신 질문 조회 실패:', error);

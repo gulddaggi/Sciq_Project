@@ -21,7 +21,7 @@ export const getUserInfo = async (): Promise<UserInfo> => {
     }
     
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     console.error('getUserInfo 에러:', error);
     if (error.response) {
       console.error('에러 응답:', error.response.data);
@@ -36,7 +36,7 @@ export const updateUserInfo = async (data: { name: string; gender: string }): Pr
     console.log('updateUserInfo 호출:', data);
     const response = await axios.post('/users/info', data);
     console.log('업데이트 응답:', response);
-  } catch (error: any) {
+  } catch (error) {
     console.error('updateUserInfo 에러:', error);
     throw error;
   }

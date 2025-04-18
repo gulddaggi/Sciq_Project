@@ -1,0 +1,65 @@
+/* 좋아요 버튼 스타일 개선 */
+.like-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid #ff4444;
+  border-radius: 20px;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.like-button:hover {
+  background-color: #ffeeee;
+}
+
+.like-button.active {
+  background-color: #ff4444;
+  color: white;
+}
+
+.like-button.active .count {
+  color: white;
+}
+
+.like-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.heart-icon {
+  transition: transform 0.3s ease;
+}
+
+.like-button:hover .heart-icon, 
+.like-button.active .heart-icon {
+  transform: scale(1.1);
+}
+
+.count {
+  font-weight: 600;
+  color: #ff4444;
+}
+
+/* 로딩 스피너 스타일 */
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+.spinning.small {
+  font-size: 16px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 기존 스타일과 통합 */
+/* ... existing code ... */ 

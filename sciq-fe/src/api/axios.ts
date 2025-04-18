@@ -3,8 +3,8 @@ import type { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axio
 
 // 환경에 따른 baseURL 설정
 const baseURL = import.meta.env.PROD 
-  ? 'http://api.sciq.co.kr/api'  // 프로덕션 환경
-  : '/api';  // 개발 환경 (프록시 사용)
+  ? '/api'  // 프로덕션 환경 (/api로 설정하면 같은 도메인에서 요청)
+  : 'http://api.sciq.co.kr/api';  // 개발 환경
 
 const instance = axios.create({
   baseURL,
@@ -22,6 +22,11 @@ instance.interceptors.request.use(
     if (token) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    // GET 요청의 경우 Content-Type 헤더 제거
+    if (config.method?.toLowerCase() === 'get') {
+      delete config.headers['Content-Type'];
     }
     
     // 개발 환경에서만 로깅

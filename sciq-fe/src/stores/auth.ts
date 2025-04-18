@@ -55,24 +55,25 @@ export const useAuthStore = defineStore('auth', () => {
 
   const getCurrentUser = async () => {
     try {
-      // 로그인한 사용자의 ID를 가져오기 위해 JWT 토큰을 디코드
-      const token = localStorage.getItem('accessToken')
-      if (!token) throw new Error('No token found')
+      const token = localStorage.getItem('accessToken');
+      if (!token) throw new Error('No token found');
       
-      // JWT 토큰에서 user id 추출 (payload의 두 번째 부분)
-      const payload = JSON.parse(atob(token.split('.')[1]))
-      const userId = payload.id
+      // JWT 토큰에서 user id 추출 (URL-safe base64 디코딩)
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const payload = JSON.parse(atob(base64));
+      const userId = payload.id;
       
-      const response = await axios.get(`/v1/users/${userId}`)
+      const response = await axios.get(`/v1/users/${userId}`);
       if (response.data.success) {
-        user.value = response.data.data
-        return user.value
+        user.value = response.data.data;
+        return user.value;
       } else {
-        throw new Error('Failed to fetch user data')
+        throw new Error('Failed to fetch user data');
       }
     } catch (error) {
-      console.error('Failed to fetch user info:', error)
-      throw error
+      console.error('Failed to fetch user info:', error);
+      throw error;
     }
   }
 
@@ -107,7 +108,7 @@ export const useAuthStore = defineStore('auth', () => {
       return tokenData
     } catch (error) {
       console.error('회원가입 에러:', error);
-      setError('회원가입에 실패했습니다. 다시 시도해주세요.')
+      setError('회원가입에 실패했습니다. 다시 시도해주세요.ㅋㅋ')
       throw error
     } finally {
       isLoading.value = false

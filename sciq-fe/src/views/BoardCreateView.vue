@@ -8,6 +8,8 @@ const title = ref('')
 const content = ref('')
 const scienceDiscipline = ref('PHYSICS')
 const isLoading = ref(false)
+const titleError = ref('')
+const contentError = ref('')
 
 const scienceDisciplines = [
   { value: 'PHYSICS', label: '물리학' },
@@ -20,9 +22,81 @@ const scienceDisciplines = [
   { value: 'ENVIRONMENTAL_SCIENCE', label: '환경 과학' }
 ]
 
+// 문자열의 바이트 수 계산
+const getByteLength = (str: string) => {
+  let byteLength = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    if (char <= 0x7F) { // ASCII 문자
+      byteLength += 1;
+    } else if (char <= 0x7FF) { // 2바이트 문자
+      byteLength += 2;
+    } else if (char <= 0xFFFF) { // 3바이트 문자 (한글 등)
+      byteLength += 3;
+    } else { // 4바이트 문자
+      byteLength += 4;
+    }
+  }
+  return byteLength;
+}
+
+// 제목 입력 시 실시간 검사
+const checkTitleLength = () => {
+  const titleByteLength = getByteLength(title.value);
+  if (titleByteLength > 100) {
+    titleError.value = '제목은 100바이트 이하로 입력해주세요.'
+  } else if (titleByteLength < 6) {
+    titleError.value = '제목은 2자 이상 입력해주세요.'
+  } else {
+    titleError.value = ''
+  }
+}
+
+// 본문 내용 입력 시 실시간 검사
+const checkContentLength = () => {
+  const contentByteLength = getByteLength(content.value);
+  if (contentByteLength > 1000) {
+    contentError.value = '내용은 1000바이트 이하로 입력해주세요.'
+  } else if (contentByteLength < 30) {
+    contentError.value = '내용은 10자 이상 입력해주세요.'
+  } else {
+    contentError.value = ''
+  }
+}
+
+const validateForm = () => {
+  let isValid = true
+  
+  const titleByteLength = getByteLength(title.value);
+  const contentByteLength = getByteLength(content.value);
+  
+  // 제목 유효성 검사 (100바이트 제한)
+  if (titleByteLength < 6) { // 최소 2글자 (한글 기준)
+    titleError.value = '제목은 2자 이상 입력해주세요.'
+    isValid = false
+  } else if (titleByteLength > 100) {
+    titleError.value = '제목은 100바이트 이하로 입력해주세요.'
+    isValid = false
+  } else {
+    titleError.value = ''
+  }
+
+  // 내용 유효성 검사 (1000바이트 제한)
+  if (contentByteLength < 30) { // 최소 10글자 (한글 기준)
+    contentError.value = '내용은 10자 이상 입력해주세요.'
+    isValid = false
+  } else if (contentByteLength > 1000) {
+    contentError.value = '내용은 1000바이트 이하로 입력해주세요.'
+    isValid = false
+  } else {
+    contentError.value = ''
+  }
+
+  return isValid
+}
+
 const handleSubmit = async () => {
-  if (!title.value.trim() || !content.value.trim()) {
-    alert('제목과 내용을 모두 입력해주세요.')
+  if (!validateForm()) {
     return
   }
 
@@ -77,17 +151,33 @@ const handleCancel = () => {
       <input 
         type="text" 
         v-model="title" 
+        @input="checkTitleLength"
         placeholder="제목을 입력하세요"
         class="title-input"
+        :class="{ 'error': titleError }"
       />
+      <div class="char-count">
+        <div class="count-info">
+          <span>{{ getByteLength(title) }}/100 바이트</span>
+          <span v-if="titleError" class="error-message">{{ titleError }}</span>
+        </div>
+      </div>
     </div>
 
     <div class="form-group">
       <textarea 
         v-model="content" 
+        @input="checkContentLength"
         placeholder="내용을 입력하세요"
         class="content-input"
+        :class="{ 'error': contentError }"
       ></textarea>
+      <div class="char-count">
+        <div class="count-info">
+          <span>{{ getByteLength(content) }}/1000 바이트</span>
+          <span v-if="contentError" class="error-message">{{ contentError }}</span>
+        </div>
+      </div>
     </div>
 
     <div v-if="isLoading" class="loading-overlay">
@@ -148,7 +238,8 @@ const handleCancel = () => {
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  position: relative;
+  margin-bottom: 2rem;
 }
 
 .discipline-select {
@@ -162,21 +253,61 @@ const handleCancel = () => {
 
 .title-input {
   width: 100%;
-  padding: 1rem;
+  padding: 0.75rem;
   border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
 }
 
 .content-input {
   width: 100%;
-  height: 400px;
-  padding: 1rem;
+  min-height: 300px;
+  max-height: 600px;
+  padding: 0.75rem;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
   resize: vertical;
+  overflow-y: auto;
+  line-height: 1.5;
+  transition: border-color 0.2s ease;
+}
+
+.title-input.error,
+.content-input.error {
+  border-color: #dc3545;
+}
+
+.title-input.error {
+  animation: shake 0.5s;
+}
+
+.char-count {
+  position: sticky;
+  bottom: 0;
+  right: 0;
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.count-info {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #666;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
 }
 
 .loading-overlay {
@@ -201,5 +332,11 @@ const handleCancel = () => {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
 }
 </style> 

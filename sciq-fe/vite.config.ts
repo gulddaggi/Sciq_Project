@@ -15,10 +15,10 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       proxy: {
-        '^/api': {
-          target: 'http://api.sciq.co.kr',
+        '/api': {
+          target: env.VITE_API_BASE_URL,
           changeOrigin: true,
-          secure: false
+          rewrite: (path) => path.replace(/^\/api/, ''),
         },
       },
     },

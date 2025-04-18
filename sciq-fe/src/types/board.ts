@@ -8,11 +8,8 @@ export enum ScienceDisciplineType {
 
 export interface ApiResponse<T> {
   success: boolean;
-  response: T;
-  error: null | {
-    message: string;
-    status: number;
-  };
+  data: T;
+  message: null | string;
 }
 
 export interface Question {

@@ -9,9 +9,9 @@ public class ErrorMessage {
     public static final String INVALID_TOKEN_EXCEPTION = "유효하지 않은 토큰입니다.";
 
     // 도메인별 에러 메시지
-    
+
     // User
-	public static final String USER_ALREADY_EXIST = "이미 존재하는 사용자입니다.";
+    public static final String USER_ALREADY_EXIST = "이미 존재하는 사용자입니다.";
     public static final String USER_ALREADY_LOGOUT = "이미 로그아웃된 사용자입니다.";
     public static final String USER_PROFILE_UPDATE_FAILED = "사용자 프로필 업데이트에 실패했습니다.";
     public static final String USER_PASSWORD_INVALID = "비밀번호는 8자 이상, 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다.";
@@ -19,7 +19,7 @@ public class ErrorMessage {
     public static final String USER_PASSWORD_CHANGE_FAILED = "비밀번호 변경에 실패했습니다.";
     public static final String USER_EMAIL_INVALID = "이메일 형식이 올바르지 않습니다.";
     public static final String USER_NICKNAME_INVALID = "닉네임은 2자 이상 10자 이하로 설정해야 합니다.";
-    
+
 
     // Debate
     public static final String DEBATE_ALREADY_CLOSED = "이미 종료된 토론입니다.";
@@ -48,7 +48,7 @@ public class ErrorMessage {
     public static final String USER_NOT_AUTHORIZED = "권한이 없는 사용자입니다.";
     public static final String FEEDBACK_TYPE_REQUIRED = "피드백 타입은 필수입니다.";
     public static final String FEEDBACK_NOT_OWNER = "피드백 작성자가 아닙니다.";
-    
+
     // Question
     public static final String QUESTION_NOT_FOUND = "질문을 찾을 수 없습니다.";
     public static final String QUESTION_UPDATE_UNAUTHORIZED = "질문을 수정할 권한이 없습니다.";
@@ -58,4 +58,7 @@ public class ErrorMessage {
     public static final String QUESTION_COMMENT_NOT_FOUND = "댓글을 찾을 수 없습니다.";
     public static final String QUESTION_COMMENT_UPDATE_UNAUTHORIZED = "댓글을 수정할 권한이 없습니다.";
     public static final String QUESTION_COMMENT_DELETE_UNAUTHORIZED = "댓글을 삭제할 권한이 없습니다.";
+
+    public static final String RECOMMEND_QUESTION_ALREADY_EXISTS = "이미 추천한 질문입니다.";
+    public static final String RECOMMEND_QUESTION_NOT_FOUND = "추천 질문을 찾을 수 없습니다.";
 }

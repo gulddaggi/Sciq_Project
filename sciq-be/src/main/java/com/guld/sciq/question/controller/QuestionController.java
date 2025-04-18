@@ -2,9 +2,9 @@ package com.guld.sciq.question.controller;
 
 import com.guld.sciq.common.response.ApiUtils;
 import com.guld.sciq.question.dto.QuestionCreateDto;
-import com.guld.sciq.question.dto.QuestionDto;
 import com.guld.sciq.question.dto.QuestionUpdateDto;
 import com.guld.sciq.question.service.QuestionService;
+import com.guld.sciq.recommendQuestion.service.RecommendQuestionService;
 import com.guld.sciq.security.UserPrincipal;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 @Tag(name = "질문 API", description = "질문 관련 API")
 @RestController
@@ -23,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class QuestionController {
     private final QuestionService questionService;
+    private final RecommendQuestionService recommendQuestionService;
 
     @Operation(summary = "질문 생성", description = "새로운 질문을 생성합니다.")
     @PostMapping
@@ -30,7 +31,7 @@ public class QuestionController {
             @Valid @RequestBody QuestionCreateDto request,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
         return ResponseEntity.ok(ApiUtils.success(
-            questionService.createQuestion(request, userPrincipal.getId())));
+                questionService.createQuestion(request, userPrincipal.getId())));
     }
 
     @Operation(summary = "질문 조회", description = "특정 질문의 상세 정보를 조회합니다.")
@@ -52,7 +53,7 @@ public class QuestionController {
             @Valid @RequestBody QuestionUpdateDto request,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
         return ResponseEntity.ok(ApiUtils.success(
-            questionService.updateQuestion(id, request, userPrincipal.getId())));
+                questionService.updateQuestion(id, request, userPrincipal.getId())));
     }
 
     @Operation(summary = "질문 삭제", description = "기존 질문을 삭제합니다.")
@@ -64,12 +65,21 @@ public class QuestionController {
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
-    @Operation(summary = "질문 추천", description = "질문에 추천을 추가합니다.")
-    @PostMapping("/{id}/recommend")
-    public ResponseEntity recommendQuestion(
-        @PathVariable Long questionId,
-        @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        questionService.recommendQuestion(questionId, userPrincipal.getId());
+    @Operation(summary = "질문 추천 토글", description = "질문에 추천을 추가합니다.")
+    @PostMapping("/{questionId}/recommend")
+    public ResponseEntity recommendQuestionToggle(
+            @PathVariable Long questionId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        questionService.recommendQuestionToggle(questionId, userPrincipal.getId());
         return ResponseEntity.ok("추천 완료");
     }
-} 
+
+    @Operation(summary = "질문 추천 상태 확인", description = "사용자가 해당 질문을 추천했는지 확인합니다.")
+    @GetMapping("/{questionId}/recommend/status")
+    public ResponseEntity<?> getRecommendStatus(
+            @PathVariable Long questionId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        boolean isRecommended = recommendQuestionService.isRecommended(questionId, userPrincipal.getId());
+        return ResponseEntity.ok(ApiUtils.success(Map.of("recommended", isRecommended)));
+    }
+}

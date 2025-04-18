@@ -24,7 +24,7 @@ jobs:
         working-directory: sciq-fe
 
       - name: Build frontend
-        run: npm run build
+        run: npx vite build
         working-directory: sciq-fe
 
       - name: Deploy to S3

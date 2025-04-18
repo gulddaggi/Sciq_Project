@@ -8,14 +8,15 @@ const instance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,  // CORS 요청에 쿠키 포함
   // 타임아웃 설정 - 서버 응답이 늦을 경우를 대비
-  timeout: 15000,
+  timeout: 30000,  // 30초로 늘림
 });
 
 // 요청 인터셉터
 instance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
@@ -63,7 +64,8 @@ instance.interceptors.response.use(
     console.error('==================');
     
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
       window.location.href = '/login';
     }
     return Promise.reject(error);

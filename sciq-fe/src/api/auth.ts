@@ -40,7 +40,9 @@ const instance = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
-  }
+  },
+  withCredentials: true,
+  timeout: 30000
 });
 
 // Request interceptor to add auth token

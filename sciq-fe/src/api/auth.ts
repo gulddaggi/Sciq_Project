@@ -13,14 +13,14 @@ export interface TokenDto {
 }
 
 // AuthDto.SignUpRequest 에 맞춰 인터페이스 필드 및 타입 정의
-export interface RegisterRequest { // export 추가하여 다른 파일에서 사용 가능하게 함
+export interface RegisterRequest {
   email: string;
   password: string;
   userName: string;
   nickName: string;
   schoolName: string;
   prefer: ScienceDisciplineType;
-  userRole: UserRole;   // 문자열 리터럴 타입 사용
+  userRole: UserRole;
 }
 
 export interface LoginRequest {
@@ -34,15 +34,20 @@ interface ApiResponse<T> {
   status: number;
 }
 
+// 환경에 따른 baseURL 설정
+const baseURL = import.meta.env.PROD 
+  ? '/api'  // 프로덕션 환경 (/api로 설정하면 같은 도메인에서 요청)
+  : 'http://api.sciq.co.kr/api';  // 개발 환경
+
 // axios 인스턴스 생성
 const instance = axios.create({
-  baseURL: import.meta.env.DEV ? '/api' : 'http://api.sciq.co.kr/api',
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   },
   withCredentials: true,
-  timeout: 30000
+  timeout: 60000
 });
 
 // Request interceptor to add auth token
@@ -56,7 +61,7 @@ instance.interceptors.request.use(
     // 개발 환경에서만 요청 로그 출력
     if (import.meta.env.DEV) {
       console.log('======= 요청 정보 =======');
-      console.log('URL:', `${config.baseURL || ''}${config.url || ''}`);
+      console.log('URL:', `${baseURL}${config.url}`);
       console.log('Method:', config.method?.toUpperCase());
       console.log('Headers:', config.headers);
       console.log('Data:', config.data);
@@ -66,7 +71,9 @@ instance.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error('Request interceptor error:', error);
+    if (import.meta.env.DEV) {
+      console.error('Request interceptor error:', error);
+    }
     return Promise.reject(error);
   }
 );
@@ -85,7 +92,10 @@ instance.interceptors.response.use(
     return response;
   },
   async (error) => {
-    console.error('Response error:', error.response || error);
+    if (import.meta.env.DEV) {
+      console.error('Response error:', error.response || error);
+    }
+    
     const originalRequest = error.config;
     
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -94,7 +104,9 @@ instance.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('refreshToken');
         if (refreshToken) {
-          console.log('Attempting token refresh');
+          if (import.meta.env.DEV) {
+            console.log('Attempting token refresh');
+          }
           const newToken = await reissue(refreshToken);
           localStorage.setItem('accessToken', newToken.accessToken);
           localStorage.setItem('refreshToken', newToken.refreshToken);
@@ -103,7 +115,9 @@ instance.interceptors.response.use(
           return instance(originalRequest);
         }
       } catch (refreshError) {
-        console.error('Token refresh failed:', refreshError);
+        if (import.meta.env.DEV) {
+          console.error('Token refresh failed:', refreshError);
+        }
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         window.location.href = '/login';
@@ -115,22 +129,24 @@ instance.interceptors.response.use(
   }
 );
 
-// axios 인스턴스를 기본 export로 설정
 export default instance;
 
-// 함수 export 추가
+// API 함수들
 export const login = async (data: { email: string; password: string }) => {
   const res = await instance.post<ApiResponse<TokenDto>>('/auth/login', data);
-  // Store tokens after successful login
   localStorage.setItem('accessToken', res.data.data.accessToken);
   localStorage.setItem('refreshToken', res.data.data.refreshToken);
   return res.data.data;
 };
 
 export const register = async (data: RegisterRequest) => {
-  console.log('API 요청 데이터:', data);
+  if (import.meta.env.DEV) {
+    console.log('API 요청 데이터:', data);
+  }
   const response = await instance.post<ApiResponse<TokenDto>>('/auth/signup', data);
-  console.log('API 응답:', response.data);
+  if (import.meta.env.DEV) {
+    console.log('API 응답:', response.data);
+  }
   return response.data.data;
 };
 

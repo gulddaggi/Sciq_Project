@@ -51,14 +51,18 @@ instance.interceptors.request.use(
     const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
-      console.log('Adding auth header:', config.headers['Authorization']);
     }
-    console.log('Request config:', {
-      url: config.url,
-      method: config.method,
-      headers: config.headers,
-      baseURL: config.baseURL
-    });
+    
+    // 개발 환경에서만 요청 로그 출력
+    if (import.meta.env.DEV) {
+      console.log('======= 요청 정보 =======');
+      console.log('URL:', `${config.baseURL || ''}${config.url || ''}`);
+      console.log('Method:', config.method?.toUpperCase());
+      console.log('Headers:', config.headers);
+      console.log('Data:', config.data);
+      console.log('=========================');
+    }
+    
     return config;
   },
   (error) => {
@@ -70,11 +74,14 @@ instance.interceptors.request.use(
 // Response interceptor to handle token refresh
 instance.interceptors.response.use(
   (response) => {
-    console.log('Response:', {
-      status: response.status,
-      url: response.config.url,
-      data: response.data
-    });
+    // 개발 환경에서만 응답 로그 출력
+    if (import.meta.env.DEV) {
+      console.log('======= 응답 정보 =======');
+      console.log('Status:', response.status);
+      console.log('URL:', response.config.url);
+      console.log('Data:', response.data);
+      console.log('=========================');
+    }
     return response;
   },
   async (error) => {

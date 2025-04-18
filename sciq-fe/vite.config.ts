@@ -19,7 +19,6 @@ export default defineConfig(({ mode }) => {
           target: 'http://api.sciq.co.kr',
           changeOrigin: true,
           secure: false,
-          rewrite: (path) => path.replace(/^\/api/, '/api'),
         },
       },
     },

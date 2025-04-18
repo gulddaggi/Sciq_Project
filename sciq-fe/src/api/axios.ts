@@ -2,9 +2,7 @@ import axios from 'axios';
 import type { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 // 환경에 따른 baseURL 설정
-const baseURL = import.meta.env.PROD
-  ? '/api'  // 프로덕션 환경 (/api로 설정하면 같은 도메인에서 요청)
-  : 'http://api.sciq.co.kr/api';  // 개발 환경
+const baseURL = '/api';  // 프록시 사용
 
 const instance = axios.create({
   baseURL,

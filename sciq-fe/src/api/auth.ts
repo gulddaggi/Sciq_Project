@@ -35,7 +35,9 @@ interface ApiResponse<T> {
 }
 
 // 환경에 따른 baseURL 설정
-const baseURL = '/api';  // 프록시 사용
+const baseURL = import.meta.env.PROD 
+  ? 'http://api.sciq.co.kr/api'  // 프로덕션 환경
+  : '/api';  // 개발 환경 (프록시 사용)
 
 // axios 인스턴스 생성
 const instance = axios.create({

@@ -15,10 +15,10 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       proxy: {
-        '/api': {
+        '^/api': {
           target: 'http://api.sciq.co.kr',
           changeOrigin: true,
-          secure: false,
+          secure: false
         },
       },
     },

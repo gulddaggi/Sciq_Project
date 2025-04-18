@@ -61,6 +61,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "sciq-be/sciq-be.zip"
           target: "~/"
+          strip_components: 0
 
       - name: Deploy on EC2 via SSH
         uses: appleboy/ssh-action@v0.1.10

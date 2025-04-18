@@ -13,7 +13,7 @@ export const getUserInfo = async (): Promise<UserInfo> => {
     const token = localStorage.getItem('token');
     console.log('현재 토큰:', token);
     
-    const response = await axios.get('/v1/users/info');
+    const response = await axios.get('/users/info');
     console.log('API 응답:', response);
     
     if (!response.data) {
@@ -21,7 +21,7 @@ export const getUserInfo = async (): Promise<UserInfo> => {
     }
     
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('getUserInfo 에러:', error);
     if (error.response) {
       console.error('에러 응답:', error.response.data);
@@ -34,9 +34,9 @@ export const getUserInfo = async (): Promise<UserInfo> => {
 export const updateUserInfo = async (data: { name: string; gender: string }): Promise<void> => {
   try {
     console.log('updateUserInfo 호출:', data);
-    const response = await axios.post('/v1/users/info', data);
+    const response = await axios.post('/users/info', data);
     console.log('업데이트 응답:', response);
-  } catch (error) {
+  } catch (error: any) {
     console.error('updateUserInfo 에러:', error);
     throw error;
   }

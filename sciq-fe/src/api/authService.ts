@@ -18,12 +18,18 @@ export enum UserRole {
   ROLE_ADVISOR = 'ROLE_ADVISOR'
 }
 
+export enum Gender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE'
+}
+
 export interface RegisterRequest {
   email: string;
   password: string;
   userName: string;
   nickName: string;
   schoolName: string;
+  gender: Gender;
   prefer: PreferSubject;
   userRole: UserRole;
 }
@@ -64,38 +70,76 @@ export const authService = {
       const response = await axios.post<TokenResponse>('/auth/login', credentials);
       console.log('로그인 응답:', response.data);
       
-      const token = response.data.response.accessToken;
-      console.log('추출된 토큰:', token);
+      let accessToken = null;
       
-      if (token) {
-        localStorage.setItem('token', token);
+      if (response.data?.response?.accessToken) {
+        accessToken = response.data.response.accessToken;
+      } else if (response.data?.accessToken) {
+        accessToken = response.data.accessToken;
+      }
+      
+      console.log('추출된 토큰:', accessToken);
+      
+      if (accessToken) {
+        localStorage.setItem('token', accessToken);
+      } else {
+        console.error('로그인 응답에서 토큰을 찾을 수 없습니다:', response.data);
       }
       
       return response.data;
-    } catch (error) {
-      console.error('로그인 실패:', error);
+    } catch (error: any) {
+      console.error('로그인 실패:', error.message);
+      
+      if (error.response) {
+        console.error('에러 상태:', error.response.status);
+        console.error('에러 데이터:', error.response.data);
+      }
+      
       throw error;
     }
   },
 
   async register(data: RegisterRequest) {
     try {
+      console.log('회원가입 요청 데이터:', data);
+      
+      // 회원가입 요청 전송
       const response = await axios.post<TokenResponse>('/auth/signup', data);
       console.log('회원가입 응답:', response.data);
 
-      if (response.data && response.data.response) {
-        const { accessToken } = response.data.response;
-        console.log('저장할 토큰:', accessToken);
-        if (accessToken) {
-          localStorage.setItem('token', accessToken);
-        }
+      // 응답 데이터 구조에 따라 토큰 추출 로직 개선
+      // 응답 구조 1: { response: { accessToken: string } }
+      // 응답 구조 2: { accessToken: string }
+      let accessToken = null;
+      
+      if (response.data?.response?.accessToken) {
+        // 중첩 구조인 경우
+        accessToken = response.data.response.accessToken;
+      } else if (response.data?.accessToken) {
+        // 단일 구조인 경우
+        accessToken = response.data.accessToken;
+      }
+      
+      console.log('추출된 토큰:', accessToken);
+      
+      if (accessToken) {
+        localStorage.setItem('token', accessToken);
       } else {
-        console.error('응답 데이터에 accessToken이 없습니다.');
+        console.error('응답 데이터에서 accessToken을 찾을 수 없습니다:', response.data);
       }
 
       return response.data;
-    } catch (error) {
-      console.error('회원가입 실패:', error);
+    } catch (error: any) {
+      console.error('회원가입 실패:', error.message);
+      
+      // 서버 응답이 있는 경우 자세한 오류 정보 로깅
+      if (error.response) {
+        console.error('에러 상태:', error.response.status);
+        console.error('에러 데이터:', error.response.data);
+      } else if (error.request) {
+        console.error('서버 응답 없음:', error.request);
+      }
+      
       throw error;
     }
   },

@@ -36,27 +36,73 @@ interface ApiResponse<T> {
 
 // axios 인스턴스 생성
 const instance = axios.create({
-  baseURL: 'http://api.sciq.co.kr/api',
+  baseURL: import.meta.env.PROD ? '/api' : 'http://api.sciq.co.kr/api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
-  }
+  },
+  timeout: 60000 // 60초
 });
 
-// Request interceptor to add auth token
+// 토큰 갱신 관련 상수
+const TOKEN_REFRESH_THRESHOLD = 10 * 60 * 1000; // 만료 10분 전
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+const onTokenRefreshed = (token: string) => {
+  refreshSubscribers.forEach((callback) => callback(token));
+  refreshSubscribers = [];
+};
+
+const addRefreshSubscriber = (callback: (token: string) => void) => {
+  refreshSubscribers.push(callback);
+};
+
+// Request interceptor
 instance.interceptors.request.use(
-  (config) => {
+  async (config) => {
     const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-      console.log('Adding auth header:', config.headers['Authorization']);
+    const expiresIn = localStorage.getItem('tokenExpiresIn');
+    
+    if (token && expiresIn) {
+      const expiration = parseInt(expiresIn);
+      const now = Date.now();
+      
+      // 토큰이 만료되기 10분 전이고 현재 갱신 중이 아닐 때
+      if (expiration - now < TOKEN_REFRESH_THRESHOLD && !isRefreshing) {
+        try {
+          isRefreshing = true;
+          const refreshToken = localStorage.getItem('refreshToken');
+          if (refreshToken) {
+            const newTokens = await reissue(refreshToken);
+            localStorage.setItem('accessToken', newTokens.accessToken);
+            localStorage.setItem('refreshToken', newTokens.refreshToken);
+            localStorage.setItem('tokenExpiresIn', newTokens.accessTokenExpiresIn.toString());
+            onTokenRefreshed(newTokens.accessToken);
+            config.headers.Authorization = `Bearer ${newTokens.accessToken}`;
+          }
+        } catch (error) {
+          console.error('Token refresh failed:', error);
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('tokenExpiresIn');
+          window.location.href = '/login';
+        } finally {
+          isRefreshing = false;
+        }
+      } else if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
-    console.log('Request config:', {
-      url: config.url,
-      method: config.method,
-      headers: config.headers,
-      baseURL: config.baseURL
-    });
+    
+    if (import.meta.env.DEV) {
+      console.log('Request config:', {
+        url: config.url,
+        method: config.method,
+        headers: config.headers,
+        baseURL: config.baseURL
+      });
+    }
     return config;
   },
   (error) => {
@@ -65,40 +111,62 @@ instance.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle token refresh
+// Response interceptor
 instance.interceptors.response.use(
   (response) => {
-    console.log('Response:', {
-      status: response.status,
-      url: response.config.url,
-      data: response.data
-    });
+    if (import.meta.env.DEV) {
+      console.log('Response:', {
+        status: response.status,
+        url: response.config.url,
+        data: response.data
+      });
+    }
     return response;
   },
   async (error) => {
-    console.error('Response error:', error.response || error);
+    if (import.meta.env.DEV) {
+      console.error('Response error:', error.response || error);
+    }
+    
     const originalRequest = error.config;
     
     if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        try {
+          return new Promise((resolve) => {
+            addRefreshSubscriber((token: string) => {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              resolve(instance(originalRequest));
+            });
+          });
+        } catch (err) {
+          return Promise.reject(err);
+        }
+      }
+      
       originalRequest._retry = true;
+      isRefreshing = true;
       
       try {
         const refreshToken = localStorage.getItem('refreshToken');
         if (refreshToken) {
-          console.log('Attempting token refresh');
-          const newToken = await reissue(refreshToken);
-          localStorage.setItem('accessToken', newToken.accessToken);
-          localStorage.setItem('refreshToken', newToken.refreshToken);
-          
-          originalRequest.headers['Authorization'] = `Bearer ${newToken.accessToken}`;
+          const newTokens = await reissue(refreshToken);
+          localStorage.setItem('accessToken', newTokens.accessToken);
+          localStorage.setItem('refreshToken', newTokens.refreshToken);
+          localStorage.setItem('tokenExpiresIn', newTokens.accessTokenExpiresIn.toString());
+          onTokenRefreshed(newTokens.accessToken);
+          originalRequest.headers.Authorization = `Bearer ${newTokens.accessToken}`;
           return instance(originalRequest);
         }
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError);
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+        localStorage.removeItem('tokenExpiresIn');
         window.location.href = '/login';
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
     

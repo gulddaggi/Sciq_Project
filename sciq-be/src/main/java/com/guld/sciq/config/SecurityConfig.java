@@ -94,6 +94,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("http://localhost:5173"); // 프론트엔드 개발 URL
         configuration.addAllowedOrigin("http://www.sciq.co.kr"); // 프로덕션 URL
+        configuration.addAllowedOrigin("http://api.sciq.co.kr:8080"); // 프론트엔드가 사용하는 API URL (포트 포함)
+        configuration.addAllowedOrigin("http://api.sciq.co.kr"); // 포트 없는 버전도 추가
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);

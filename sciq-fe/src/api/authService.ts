@@ -103,20 +103,14 @@ export const authService = {
     try {
       console.log('회원가입 요청 데이터:', data);
       
-      // 회원가입 요청 전송
       const response = await axios.post<TokenResponse>('/auth/signup', data);
       console.log('회원가입 응답:', response.data);
 
-      // 응답 데이터 구조에 따라 토큰 추출 로직 개선
-      // 응답 구조 1: { response: { accessToken: string } }
-      // 응답 구조 2: { accessToken: string }
       let accessToken = null;
       
       if (response.data?.response?.accessToken) {
-        // 중첩 구조인 경우
         accessToken = response.data.response.accessToken;
       } else if (response.data?.accessToken) {
-        // 단일 구조인 경우
         accessToken = response.data.accessToken;
       }
       
@@ -132,7 +126,6 @@ export const authService = {
     } catch (error: any) {
       console.error('회원가입 실패:', error.message);
       
-      // 서버 응답이 있는 경우 자세한 오류 정보 로깅
       if (error.response) {
         console.error('에러 상태:', error.response.status);
         console.error('에러 데이터:', error.response.data);

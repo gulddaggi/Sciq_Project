@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
-// API 서버 기본 URL 설정
-const baseURL = 'http://api.sciq.co.kr:8080';
+// API 서버 기본 URL 설정 - 컨텍스트 경로(/api) 포함
+const baseURL = 'http://api.sciq.co.kr:8080/api';
 
 const instance = axios.create({
   baseURL,

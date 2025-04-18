@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 // API 서버 기본 URL 설정 - 컨텍스트 경로(/api) 포함
 const baseURL = 'http://api.sciq.co.kr/api';
@@ -14,7 +14,7 @@ const instance = axios.create({
 
 // 요청 인터셉터
 instance.interceptors.request.use(
-  (config: AxiosRequestConfig) => {
+  (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem('token');
     if (token) {
       config.headers = config.headers || {};

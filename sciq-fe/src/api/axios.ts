@@ -1,7 +1,10 @@
-import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios from 'axios';
+import type { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
-// API 서버 기본 URL 설정 - 컨텍스트 경로(/api) 포함
-const baseURL = 'http://api.sciq.co.kr/api';
+// API 서버 기본 URL 설정
+// 개발 환경에서는 상대 경로를 사용하여 Vite의 프록시를 통해 요청을 전달
+// 프로덕션 환경에서는 전체 URL을 사용
+const baseURL = import.meta.env.DEV ? '/api' : 'http://api.sciq.co.kr/api';
 
 const instance = axios.create({
   baseURL,

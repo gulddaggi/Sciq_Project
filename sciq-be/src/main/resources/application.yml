@@ -34,11 +34,15 @@ springdoc:
   swagger-ui:
     path: /swagger-ui/index.html
     disable-swagger-default-url: true
-    url: /api/v3/api-docs
-    config-url: /api/v3/api-docs/swagger-config
-  paths-to-match: /v1/**
+    url: /v3/api-docs
+    config-url: /v3/api-docs/swagger-config
+    display-request-duration: true
+    operations-sorter: alpha
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
+  paths-to-match:
+    - /v1/**
+    - /auth/**
 
 jwt:
   secret: ${JWT_SECRET}

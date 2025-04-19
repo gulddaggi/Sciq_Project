@@ -36,7 +36,9 @@ interface ApiResponse<T> {
 
 // axios 인스턴스 생성
 const instance = axios.create({
-  baseURL: import.meta.env.PROD ? '/api' : 'http://api.sciq.co.kr/api',
+  baseURL: import.meta.env.PROD 
+    ? '/api'  // 프로덕션 환경
+    : 'http://api.sciq.co.kr/api',  // 개발 환경
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
@@ -183,6 +185,7 @@ export const login = async (data: { email: string; password: string }) => {
   // Store tokens after successful login
   localStorage.setItem('accessToken', res.data.data.accessToken);
   localStorage.setItem('refreshToken', res.data.data.refreshToken);
+  localStorage.setItem('tokenExpiresIn', res.data.data.accessTokenExpiresIn.toString());
   return res.data.data;
 };
 

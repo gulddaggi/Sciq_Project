@@ -81,6 +81,12 @@ jobs:
             mkdir -p ~/sciq-be
             unzip -o ~/sciq-be.zip -d ~/sciq-be
             cd ~/sciq-be
+            
+            # Debug: List contents to verify JAR location
+            ls -la
+            
+            # Rename JAR to app.jar for consistency
+            mv *.jar app.jar
 
             echo '
             version: "3.8"
@@ -92,7 +98,15 @@ jobs:
                   - "8080:8080"
                 volumes:
                   - ./app.jar:/app.jar
+                environment:
+                  - SPRING_PROFILES_ACTIVE=prod
+                  - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/sciq
+                  - SPRING_DATASOURCE_USERNAME=${{ secrets.MYSQL_USER }}
+                  - SPRING_DATASOURCE_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+                  - JWT_SECRET=${{ secrets.JWT_SECRET }}
                 command: ["java", "-jar", "/app.jar"]
+                depends_on:
+                  - db
                 restart: always
               db:
                 image: mysql:8.0
@@ -106,11 +120,28 @@ jobs:
                   - "3306:3306"
                 volumes:
                   - mysql-data:/var/lib/mysql
+                healthcheck:
+                  test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+                  interval: 10s
+                  timeout: 5s
+                  retries: 5
             volumes:
               mysql-data:
             ' > docker-compose.yml
 
+            # Debug: Check if app.jar exists
+            ls -la app.jar
+            
+            # Stop and remove existing containers
             sudo docker-compose down
-            sudo docker stop sciq-mysql || true
-            sudo docker rm sciq-mysql || true
+            sudo docker stop sciq-mysql sciq-backend || true
+            sudo docker rm sciq-mysql sciq-backend || true
+            
+            # Start services with logs
             sudo docker-compose up -d
+            
+            # Show logs for debugging
+            echo "Backend logs:"
+            sudo docker logs sciq-backend
+            echo "MySQL logs:"
+            sudo docker logs sciq-mysql

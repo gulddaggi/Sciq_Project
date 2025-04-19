@@ -21,7 +21,7 @@ const handleLogout = () => {
 
 const goToProfile = () => {
   if (isAuthenticated.value) {
-    router.push('/mypage')
+    router.push('/profile')
   } else {
     router.push('/login')
   }

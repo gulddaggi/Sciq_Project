@@ -15,6 +15,11 @@ const handleLogout = () => {
   authStore.logout()
   props.onClose()
 }
+
+const goToProfileView = () => {
+  router.push('/profile/view')
+  props.onClose()
+}
 </script>
 
 <template>
@@ -28,7 +33,7 @@ const handleLogout = () => {
 
     <div class="auth-section">
       <template v-if="isAuthenticated">
-        <div class="user-info">
+        <div class="user-info" @click="goToProfileView">
           <span class="material-icons">account_circle</span>
           <span class="user-name">{{ authStore.user?.nickName }}님</span>
         </div>
@@ -49,11 +54,6 @@ const handleLogout = () => {
       <router-link to="/" class="menu-item" @click="onClose">
         <span class="material-icons">home</span>
         <span>홈</span>
-      </router-link>
-      
-      <router-link v-if="isAuthenticated" to="/mypage" class="menu-item" @click="onClose">
-        <span class="material-icons">person</span>
-        <span>마이페이지</span>
       </router-link>
       
       <router-link to="/board" class="menu-item" @click="onClose">
@@ -126,6 +126,14 @@ const handleLogout = () => {
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 1rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.user-info:hover {
+  background-color: #f0f2f5;
 }
 
 .user-info .material-icons {

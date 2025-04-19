@@ -27,7 +27,7 @@
             <span class="material-icons">person</span>
           </div>
           <div class="user-details">
-            <span class="user-name">{{ question.user?.nickName || '알 수 없음' }}</span>
+            <span class="user-name">{{ question.userNickName }}</span>
             <span class="post-date">{{ formatDate(question.createdAt) }}</span>
           </div>
         </div>
@@ -36,11 +36,11 @@
         <div class="stats">
           <span class="stat-item">
             <span class="material-icons">comment</span>
-            {{ question.comments?.length || 0 }}
+            {{ question.commentCount || 0 }}
           </span>
           <span class="stat-item">
             <span class="material-icons">visibility</span>
-            {{ 0 }}
+            {{ question.viewCount || 0 }}
           </span>
         </div>
       </div>
@@ -51,7 +51,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Question } from '@/types/board'
+import type { Question } from '@/api/questionService'
 
 const props = defineProps<{
   question: Question
@@ -111,7 +111,7 @@ const formatDate = (dateString: string) => {
 }
 
 const navigateToDetail = () => {
-  router.push(`/board/${props.question.id}`)
+  router.push(`/questions/${props.question.id}`)
 }
 </script>
 

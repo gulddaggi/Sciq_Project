@@ -23,15 +23,21 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../pages/Signup.vue')
   },
   {
-    path: '/mypage',
-    name: 'MyPage',
-    component: () => import('../pages/MyPage.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
     path: '/profile',
     name: 'Profile',
     component: () => import('../pages/Profile.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/profile/view',
+    name: 'ProfileView',
+    component: () => import('../pages/Profile/ProfileView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/profile/edit',
+    name: 'ProfileEdit',
+    component: () => import('../pages/Profile/ProfileEdit.vue'),
     meta: { requiresAuth: true }
   },
   {
@@ -84,6 +90,12 @@ const routes: RouteRecordRaw[] = [
     path: '/posts/:id',
     name: 'post-detail',
     component: PostDetailView
+  },
+  {
+    path: '/questions/:id',
+    name: 'question-detail',
+    component: () => import('../views/QuestionDetailView.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 // 라우터 생성

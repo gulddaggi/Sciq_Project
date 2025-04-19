@@ -50,7 +50,7 @@
 import { ref, onMounted } from 'vue'
 import QuestionCard from '@/components/QuestionCard.vue'
 import { questionService } from '@/api/questionService'
-import type { Question } from '@/api/questionService'
+import type { Question } from '@/types/board'
 
 const popularQuestions = ref<Question[]>([])
 const recentQuestions = ref<Question[]>([])
@@ -59,11 +59,39 @@ const fetchQuestions = async () => {
   try {
     // 인기 게시글 (추천수 기준)
     const popularResponse = await questionService.getPopularQuestions()
-    popularQuestions.value = popularResponse.questions
+    console.log('인기글 API 응답:', popularResponse)
+    
+    if (popularResponse.success && popularResponse.data) {
+      // any 타입으로 처리하여 타입 오류 회피
+      const data = popularResponse.data as any
+      
+      if (Array.isArray(data)) {
+        popularQuestions.value = data
+      } else if (data.content) {
+        popularQuestions.value = data.content
+      } else {
+        console.error('인기글 데이터 구조가 예상과 다릅니다')
+        popularQuestions.value = []
+      }
+    }
 
     // 최신 게시글
     const recentResponse = await questionService.getRecentQuestions()
-    recentQuestions.value = recentResponse.questions
+    console.log('최신글 API 응답:', recentResponse)
+    
+    if (recentResponse.success && recentResponse.data) {
+      // any 타입으로 처리하여 타입 오류 회피
+      const data = recentResponse.data as any
+      
+      if (Array.isArray(data)) {
+        recentQuestions.value = data
+      } else if (data.content) {
+        recentQuestions.value = data.content
+      } else {
+        console.error('최신글 데이터 구조가 예상과 다릅니다')
+        recentQuestions.value = []
+      }
+    }
   } catch (error) {
     console.error('게시글 로딩 실패:', error)
   }

@@ -6,6 +6,7 @@ import com.guld.sciq.question.dto.QuestionUpdateDto;
 import com.guld.sciq.question.service.QuestionService;
 import com.guld.sciq.recommendQuestion.service.RecommendQuestionService;
 import com.guld.sciq.security.UserPrincipal;
+import com.guld.sciq.user.service.UserPointService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,14 +25,17 @@ import java.util.Map;
 public class QuestionController {
     private final QuestionService questionService;
     private final RecommendQuestionService recommendQuestionService;
+    private final UserPointService userPointService;
 
     @Operation(summary = "질문 생성", description = "새로운 질문을 생성합니다.")
     @PostMapping
     public ResponseEntity<?> createQuestion(
             @Valid @RequestBody QuestionCreateDto request,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return ResponseEntity.ok(ApiUtils.success(
-            questionService.createQuestion(request, userPrincipal.getId())));
+        var result = questionService.createQuestion(request, userPrincipal.getId());
+        // 게시글 작성 시 포인트 부여
+        userPointService.addPointForPostCreation(userPrincipal.getId());
+        return ResponseEntity.ok(ApiUtils.success(result));
     }
 
     @Operation(summary = "질문 조회", description = "특정 질문의 상세 정보를 조회합니다.")

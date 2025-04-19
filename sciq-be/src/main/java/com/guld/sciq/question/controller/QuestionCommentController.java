@@ -9,6 +9,7 @@ import com.guld.sciq.question.comment.dto.QuestionCommentUpdateDto;
 import com.guld.sciq.question.comment.service.QuestionCommentService;
 import com.guld.sciq.security.UserPrincipal;
 import com.guld.sciq.utils.ApiUtils;
+import com.guld.sciq.user.service.UserPointService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/v1/questions/{questionId}/comments")
 public class QuestionCommentController {
     private final QuestionCommentService questionCommentService;
+    private final UserPointService userPointService;
 
     @Operation(summary = "댓글 생성", description = "질문에 댓글을 생성합니다.")
     @PostMapping
@@ -31,8 +33,13 @@ public class QuestionCommentController {
         boolean isAdvisor = userPrincipal.getAuthorities().stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADVISOR"));
         
-        return ResponseEntity.ok(ApiUtils.success(
-                questionCommentService.createComment(createDto, questionId, userPrincipal.getId(), userPrincipal.getNickName(), isAdvisor)));
+        var result = questionCommentService.createComment(createDto, questionId, userPrincipal.getId(), 
+                userPrincipal.getNickName(), isAdvisor);
+        
+        // 댓글 작성 시 포인트 부여
+        userPointService.addPointForCommentCreation(userPrincipal.getId());
+        
+        return ResponseEntity.ok(ApiUtils.success(result));
     }
 
     @Operation(summary = "댓글 조회", description = "특정 댓글을 조회합니다.")

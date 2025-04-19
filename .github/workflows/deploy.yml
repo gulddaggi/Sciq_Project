@@ -17,7 +17,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'  # 실제 사용 버전 확인
+          node-version: '18'
 
       - name: Install dependencies
         run: npm ci
@@ -38,8 +38,6 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           SOURCE_DIR: sciq-fe/dist
 
-
-
   backend:
     name: Deploy Backend to EC2
     runs-on: ubuntu-latest
@@ -49,8 +47,18 @@ jobs:
       - name: Checkout backend code
         uses: actions/checkout@v3
 
-      - name: Zip backend source
-        run: zip -r sciq-be.zip *
+      - name: Set up JDK for Spring Boot
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build backend JAR
+        run: ./gradlew clean bootJar
+        working-directory: sciq-be
+
+      - name: Zip JAR
+        run: zip -j sciq-be.zip build/libs/*.jar
         working-directory: sciq-be
 
       - name: Copy to EC2
@@ -61,7 +69,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "sciq-be/sciq-be.zip"
           target: "~/"
-          strip_components: 0
 
       - name: Deploy on EC2 via SSH
         uses: appleboy/ssh-action@v0.1.10
@@ -71,8 +78,37 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             rm -rf ~/sciq-be
+            mkdir -p ~/sciq-be
             unzip -o ~/sciq-be.zip -d ~/sciq-be
-            cd ~/sciq-be/sciq-be
+            cd ~/sciq-be
+
+            echo '
+            version: "3.8"
+            services:
+              app:
+                image: eclipse-temurin:17-jre
+                container_name: sciq-backend
+                ports:
+                  - "8080:8080"
+                volumes:
+                  - ./app.jar:/app.jar
+                command: ["java", "-jar", "/app.jar"]
+                restart: always
+              db:
+                image: mysql:8.0
+                container_name: sciq-mysql
+                environment:
+                  MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+                  MYSQL_DATABASE: sciq
+                  MYSQL_USER: ${{ secrets.MYSQL_USER }}
+                  MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+                ports:
+                  - "3306:3306"
+                volumes:
+                  - mysql-data:/var/lib/mysql
+            volumes:
+              mysql-data:
+            ' > docker-compose.yml
+
             sudo docker-compose down
-            sudo docker-compose build --no-cache
             sudo docker-compose up -d

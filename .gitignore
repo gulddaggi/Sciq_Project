@@ -18,12 +18,6 @@ Thumbs.db
 # =============================
 # Java / Spring Boot / Gradle
 # =============================
-# Gradle wrapper files
-gradlew
-gradlew.bat
-gradle/wrapper/gradle-wrapper.jar
-gradle/wrapper/gradle-wrapper.properties
-
 # Gradle caches and build outputs
 .gradle/
 **/build/
@@ -35,6 +29,7 @@ gradle/wrapper/gradle-wrapper.properties
 # Executable jar/war files
 **/*.jar
 **/*.war
+!gradle/wrapper/gradle-wrapper.jar
 
 # Spring Boot specific error logs
 hs_err_pid*
@@ -69,6 +64,7 @@ Dockerfile
 
 # =============================
 # Miscellaneous
-# =============================n*.swp
+# =============================
+*.swp
 *~
 

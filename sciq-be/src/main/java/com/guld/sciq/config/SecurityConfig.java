@@ -95,6 +95,7 @@ public class SecurityConfig {
         // 프론트엔드 URL 설정
         configuration.setAllowedOriginPatterns(java.util.List.of(
             "http://localhost:5173",
+            "http://localhost:8080",
             "http://www.sciq.co.kr",
             "http://api.sciq.co.kr"
         ));

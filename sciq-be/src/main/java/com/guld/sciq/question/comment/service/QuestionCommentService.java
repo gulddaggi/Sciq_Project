@@ -7,7 +7,7 @@ import com.guld.sciq.question.comment.dto.QuestionCommentUpdateDto;
 import java.util.List;
 
 public interface QuestionCommentService {
-    QuestionCommentDto createComment(QuestionCommentCreateDto createDto, Long questionId, Long userId, String userNickName);
+    QuestionCommentDto createComment(QuestionCommentCreateDto createDto, Long questionId, Long userId, String userNickName, boolean isAdvisor);
     QuestionCommentDto getComment(Long commentId);
     QuestionCommentDto updateComment(Long commentId, QuestionCommentUpdateDto updateDto, Long userId);
     void deleteComment(Long commentId, Long userId);

@@ -24,8 +24,8 @@ public class QuestionCommentServiceImpl implements QuestionCommentService {
 
     @Override
     @Transactional
-    public QuestionCommentDto createComment(QuestionCommentCreateDto createDto, Long questionId, Long userId, String userNickName) {
-        return questionCommentProcessor.createComment(createDto, questionId, userId, userNickName);
+    public QuestionCommentDto createComment(QuestionCommentCreateDto createDto, Long questionId, Long userId, String userNickName, boolean isAdvisor) {
+        return questionCommentProcessor.createComment(createDto, questionId, userId, userNickName, isAdvisor);
     }
 
     @Override

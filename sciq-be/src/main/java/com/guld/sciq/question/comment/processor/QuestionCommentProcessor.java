@@ -19,7 +19,7 @@ public class QuestionCommentProcessor {
     private final QuestionCommentRepository questionCommentRepository;
     private final UserService userService;
 
-    public QuestionCommentDto createComment(QuestionCommentCreateDto createDto, Long questionId, Long userId, String userNickName) {
+    public QuestionCommentDto createComment(QuestionCommentCreateDto createDto, Long questionId, Long userId, String userNickName, boolean isAdvisor) {
         QuestionComment comment = QuestionComment.builder()
                 .content(createDto.content())
                 .commentType(createDto.commentType())
@@ -29,7 +29,10 @@ public class QuestionCommentProcessor {
                 .likeCnt(0)
                 .build();
 
-        return QuestionCommentDto.from(questionCommentRepository.save(comment));
+        QuestionComment savedComment = questionCommentRepository.save(comment);
+        QuestionCommentDto dto = QuestionCommentDto.from(savedComment);
+        dto.setAdvisor(isAdvisor);
+        return dto;
     }
 
     public QuestionCommentDto getComment(Long commentId) {

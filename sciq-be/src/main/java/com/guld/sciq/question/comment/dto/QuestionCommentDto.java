@@ -39,6 +39,9 @@ public class QuestionCommentDto {
     @Schema(description = "수정일시")
     private LocalDateTime updatedAt;
 
+    @Schema(description = "댓글 작성자가 어드바이저인지 여부", example = "true")
+    private boolean isAdvisor;
+
     public static QuestionCommentDto from(QuestionComment comment) {
         return QuestionCommentDto.builder()
                 .id(comment.getId())

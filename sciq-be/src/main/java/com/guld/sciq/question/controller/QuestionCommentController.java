@@ -27,8 +27,12 @@ public class QuestionCommentController {
             @PathVariable Long questionId,
             @RequestBody QuestionCommentCreateDto createDto,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        
+        boolean isAdvisor = userPrincipal.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADVISOR"));
+        
         return ResponseEntity.ok(ApiUtils.success(
-                questionCommentService.createComment(createDto, questionId, userPrincipal.getId(), userPrincipal.getNickName())));
+                questionCommentService.createComment(createDto, questionId, userPrincipal.getId(), userPrincipal.getNickName(), isAdvisor)));
     }
 
     @Operation(summary = "댓글 조회", description = "특정 댓글을 조회합니다.")

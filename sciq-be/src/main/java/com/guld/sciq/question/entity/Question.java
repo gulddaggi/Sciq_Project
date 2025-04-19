@@ -23,7 +23,7 @@ public class Question extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -47,15 +47,15 @@ public class Question extends BaseEntity {
         this.content = content;
         this.scienceDiscipline = scienceDiscipline;
     }
-
+    
     public void incrementRecommendCnt() {
         this.recommendCnt++;
     }
-
+    
     public void decrementRecommendCnt() {
         if (this.recommendCnt > 0) {
             this.recommendCnt--;
         }
     }
-
+    
 }

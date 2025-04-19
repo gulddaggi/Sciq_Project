@@ -1,4 +1,3 @@
-
 package com.guld.sciq.recommendQuestion.entity;
 
 import jakarta.persistence.Column;
@@ -14,21 +13,21 @@ import lombok.Getter;
 @Getter
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"questionId", "userId"})})
 public class RecommendQuestion {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private Long questionId;
-
-    @Column(nullable = false)
-    private Long userId;
-
-    public RecommendQuestion() {
-    }
-
-    public RecommendQuestion(Long questionId, Long userId) {
-        this.questionId = questionId;
-        this.userId = userId;
-    }
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	@Column(nullable = false)
+	private Long questionId;
+	
+	@Column(nullable = false)
+	private Long userId;
+	
+	public RecommendQuestion() {
+	}
+	
+	public RecommendQuestion(Long questionId, Long userId) {
+		this.questionId = questionId;
+		this.userId = userId;
+	}
 }

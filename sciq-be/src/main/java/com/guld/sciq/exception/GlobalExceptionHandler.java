@@ -97,6 +97,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleQuestionNotFoundException(QuestionNotFoundException ex) {
         return createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
+    
+    @ExceptionHandler(RecommendException.class)
+    public ResponseEntity<?> handleRecommendException(RecommendException ex) {
+        return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
 
     private static ResponseEntity<ApiUtils.ApiFail> createErrorResponse(HttpStatus httpStatus, String message) {
         ApiUtils.ApiFail apiFail = ApiUtils.fail(httpStatus.value(), message);

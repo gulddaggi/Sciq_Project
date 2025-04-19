@@ -33,7 +33,7 @@ public class QuestionServiceImpl implements QuestionService {
     public QuestionDto getQuestion(Long questionId) {
         return questionProcessor.getQuestion(questionId);
     }
-
+    
     @Override
     public List<QuestionDto> getAllQuestions() {
         return questionRepository.findAll()
@@ -41,7 +41,7 @@ public class QuestionServiceImpl implements QuestionService {
                 .map(QuestionDto::from)
                 .collect(Collectors.toList());
     }
-
+    
     @Override
     @Transactional
     public QuestionDto updateQuestion(Long questionId, QuestionUpdateDto updateDto, Long userId) {

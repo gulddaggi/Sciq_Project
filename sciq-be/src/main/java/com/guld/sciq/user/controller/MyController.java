@@ -20,16 +20,16 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/v1/mypage")
 @RequiredArgsConstructor
 public class MyController {
-
-    private final RecommendQuestionService recommendQuestionService;
-    // getRecommendedQuestionsByUserId
-    // 마이페이지 - 내가 추천한 질문들 조회
-    @Operation(summary = "내가 추천한 질문들 조회", description = "내가 추천한 질문들을 조회합니다.")
-    @GetMapping("/recommended-questions")
-    public ResponseEntity<?> getRecommendedQuestionsByUserId(
-            @AuthenticationPrincipal UserPrincipal userPrincipal
-    ) {
-        return ResponseEntity.ok(ApiUtils.success(recommendQuestionService.getRecommendedQuestionsByUserId(userPrincipal.getId())));
-    }
-
+	
+	private final RecommendQuestionService recommendQuestionService;
+	// getRecommendedQuestionsByUserId
+	// 마이페이지 - 내가 추천한 질문들 조회
+	@Operation(summary = "내가 추천한 질문들 조회", description = "내가 추천한 질문들을 조회합니다.")
+	@GetMapping("/recommended-questions")
+	public ResponseEntity<?> getRecommendedQuestionsByUserId(
+		@AuthenticationPrincipal UserPrincipal userPrincipal
+	) {
+		return ResponseEntity.ok(ApiUtils.success(recommendQuestionService.getRecommendedQuestionsByUserId(userPrincipal.getId())));
+	}
+	
 }

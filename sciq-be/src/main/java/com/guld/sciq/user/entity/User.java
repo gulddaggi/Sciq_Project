@@ -50,7 +50,7 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
-
+    
     @Column(nullable = false)
     @Builder.Default
     private int points = 0;

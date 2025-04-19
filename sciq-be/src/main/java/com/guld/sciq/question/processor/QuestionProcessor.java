@@ -29,7 +29,7 @@ public class QuestionProcessor {
                 .scienceDiscipline(createDto.getScienceDiscipline())
                 .recommendCnt(0)
                 .build();
-
+        
         return QuestionDto.from(questionRepository.save(question));
     }
 
@@ -42,15 +42,15 @@ public class QuestionProcessor {
     public QuestionDto updateQuestion(Long questionId, QuestionUpdateDto updateDto, Long userId) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new QuestionNotFoundException(ErrorMessage.QUESTION_NOT_FOUND));
-
+        
         if (!question.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException(ErrorMessage.QUESTION_UPDATE_UNAUTHORIZED);
         }
 
         question.updateQuestion(
-                updateDto.getTitle(),
-                updateDto.getContent(),
-                updateDto.getScienceDiscipline()
+            updateDto.getTitle(),
+            updateDto.getContent(),
+            updateDto.getScienceDiscipline()
         );
 
         return QuestionDto.from(questionRepository.save(question));
@@ -59,7 +59,7 @@ public class QuestionProcessor {
     public void deleteQuestion(Long questionId, Long userId) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new QuestionNotFoundException(ErrorMessage.QUESTION_NOT_FOUND));
-
+        
         if (!question.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException(ErrorMessage.QUESTION_DELETE_UNAUTHORIZED);
         }
@@ -70,7 +70,7 @@ public class QuestionProcessor {
     public void recommendQuestionToggle(Long questionId, Long userId) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new QuestionNotFoundException(ErrorMessage.QUESTION_NOT_FOUND));
-
+        
         if (recommendQuestionService.isRecommended(questionId, userId)) {
             recommendQuestionService.cancelRecommendQuestion(questionId, userId);
             question.decrementRecommendCnt();

@@ -1,5 +1,6 @@
 package com.guld.sciq.question.comment.dto;
 
+import com.guld.sciq.question.comment.entity.CommentType;
 import com.guld.sciq.question.comment.entity.QuestionComment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,9 @@ public class QuestionCommentDto {
     @Schema(description = "댓글 내용", example = "좋은 질문이네요!")
     private String content;
 
+    @Schema(description = "댓글 타입", example = "OPINION")
+    private CommentType commentType;
+
     @Schema(description = "좋아요 수", example = "0")
     private Integer likeCnt;
 
@@ -41,6 +45,7 @@ public class QuestionCommentDto {
                 .content(comment.getContent())
                 .userId(comment.getUserId())
                 .userNickName(comment.getUserNickName())
+                .commentType(comment.getCommentType())
                 .likeCnt(comment.getLikeCnt())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())

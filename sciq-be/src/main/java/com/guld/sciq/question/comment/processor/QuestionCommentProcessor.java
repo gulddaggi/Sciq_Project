@@ -22,12 +22,13 @@ public class QuestionCommentProcessor {
     public QuestionCommentDto createComment(QuestionCommentCreateDto createDto, Long questionId, Long userId, String userNickName) {
         QuestionComment comment = QuestionComment.builder()
                 .content(createDto.content())
+                .commentType(createDto.commentType())
                 .question(Question.builder().id(questionId).build())
                 .userId(userId)
                 .userNickName(userNickName)
                 .likeCnt(0)
                 .build();
-        
+
         return QuestionCommentDto.from(questionCommentRepository.save(comment));
     }
 
@@ -40,7 +41,7 @@ public class QuestionCommentProcessor {
     public QuestionCommentDto updateComment(Long commentId, QuestionCommentUpdateDto updateDto, Long userId) {
         QuestionComment comment = questionCommentRepository.findById(commentId)
                 .orElseThrow(() -> new QuestionCommentNotFoundException(ErrorMessage.QUESTION_COMMENT_NOT_FOUND));
-        
+
         if (!comment.getUserId().equals(userId)) {
             throw new IllegalArgumentException(ErrorMessage.QUESTION_COMMENT_UPDATE_UNAUTHORIZED);
         }
@@ -52,7 +53,7 @@ public class QuestionCommentProcessor {
     public void deleteComment(Long commentId, Long userId) {
         QuestionComment comment = questionCommentRepository.findById(commentId)
                 .orElseThrow(() -> new QuestionCommentNotFoundException(ErrorMessage.QUESTION_COMMENT_NOT_FOUND));
-        
+
         if (!comment.getUserId().equals(userId)) {
             throw new IllegalArgumentException(ErrorMessage.QUESTION_COMMENT_DELETE_UNAUTHORIZED);
         }
@@ -63,7 +64,7 @@ public class QuestionCommentProcessor {
     public void likeComment(Long commentId, Long userId) {
         QuestionComment comment = questionCommentRepository.findById(commentId)
                 .orElseThrow(() -> new QuestionCommentNotFoundException(ErrorMessage.QUESTION_COMMENT_NOT_FOUND));
-        
+
         comment.increaseLikeCnt();
         questionCommentRepository.save(comment);
     }

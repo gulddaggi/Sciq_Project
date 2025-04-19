@@ -28,7 +28,7 @@ public class QuestionCommentController {
             @RequestBody QuestionCommentCreateDto createDto,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
         return ResponseEntity.ok(ApiUtils.success(
-            questionCommentService.createComment(createDto, questionId, userPrincipal.getId(), userPrincipal.getNickName())));
+                questionCommentService.createComment(createDto, questionId, userPrincipal.getId(), userPrincipal.getNickName())));
     }
 
     @Operation(summary = "댓글 조회", description = "특정 댓글을 조회합니다.")
@@ -44,7 +44,7 @@ public class QuestionCommentController {
             @RequestBody QuestionCommentUpdateDto updateDto,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
         return ResponseEntity.ok(ApiUtils.success(
-            questionCommentService.updateComment(commentId, updateDto, userPrincipal.getId())));
+                questionCommentService.updateComment(commentId, updateDto, userPrincipal.getId())));
     }
 
     @Operation(summary = "댓글 삭제", description = "댓글을 삭제합니다.")

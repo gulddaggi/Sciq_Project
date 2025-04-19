@@ -32,6 +32,10 @@ public class QuestionComment extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CommentType commentType;
+
     @Column(nullable = false)
     private Integer likeCnt;
 

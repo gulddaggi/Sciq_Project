@@ -97,6 +97,9 @@ jobs:
             rm -rf ~/sciq-be
             mkdir -p ~/sciq-be
             
+            # Copy .env file
+            cp .env ~/sciq-be/.env
+            
             # Unzip and check contents
             cd ~/sciq-be
             unzip -o ../sciq-be.zip
@@ -119,12 +122,9 @@ jobs:
                   - "8080:8080"
                 volumes:
                   - ./app.jar:/app.jar
-                environment:
-                  - SPRING_PROFILES_ACTIVE=prod
-                  - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/sciq
-                  - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
-                  - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
-                  - JWT_SECRET=${JWT_SECRET}
+                  - ./.env:/app/.env
+                env_file:
+                  - .env
                 command: ["java", "-jar", "/app.jar"]
                 depends_on:
                   - db
@@ -132,11 +132,8 @@ jobs:
               db:
                 image: mysql:8.0
                 container_name: sciq-mysql
-                environment:
-                  MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-                  MYSQL_DATABASE: sciq
-                  MYSQL_USER: ${MYSQL_USER}
-                  MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+                env_file:
+                  - .env
                 ports:
                   - "3306:3306"
                 volumes:
@@ -149,16 +146,6 @@ jobs:
             volumes:
               mysql-data:
             EOF
-            
-            # Export environment variables
-            export MYSQL_ROOT_PASSWORD='${{ secrets.MYSQL_ROOT_PASSWORD }}'
-            export MYSQL_USER='${{ secrets.MYSQL_USER }}'
-            export MYSQL_PASSWORD='${{ secrets.MYSQL_PASSWORD }}'
-            export JWT_SECRET='${{ secrets.JWT_SECRET }}'
-            
-            # Replace environment variables in docker-compose.yml
-            envsubst < docker-compose.yml > docker-compose.tmp
-            mv docker-compose.tmp docker-compose.yml
             
             # Stop and remove existing containers
             sudo docker-compose down || true

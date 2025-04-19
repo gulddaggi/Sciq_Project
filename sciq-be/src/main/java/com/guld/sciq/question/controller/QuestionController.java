@@ -8,11 +8,6 @@ import com.guld.sciq.recommendQuestion.service.RecommendQuestionService;
 import com.guld.sciq.security.UserPrincipal;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -79,35 +74,11 @@ public class QuestionController {
         return ResponseEntity.ok("추천 완료");
     }
     
-    @Operation(
-        summary = "질문 추천 상태 확인",
-        description = "사용자가 해당 질문을 추천했는지 확인합니다."
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "추천 상태 조회 성공",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(
-                    type = "object",
-                    example = "{\"success\": true, \"response\": {\"recommended\": true}}",
-                    properties = {
-                        @Schema(name = "recommended", description = "추천 여부", type = "boolean")
-                    }
-                )
-            )
-        ),
-        @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
-        @ApiResponse(responseCode = "404", description = "질문을 찾을 수 없음")
-    })
+    @Operation(summary = "질문 추천 상태 확인", description = "사용자가 해당 질문을 추천했는지 확인합니다.")
     @GetMapping("/{questionId}/recommend/status")
     public ResponseEntity<?> getRecommendStatus(
-        @Parameter(description = "조회할 질문의 ID", required = true, example = "1")
         @PathVariable Long questionId,
-        @Parameter(hidden = true)
-        @AuthenticationPrincipal UserPrincipal userPrincipal
-    ) {
+        @AuthenticationPrincipal UserPrincipal userPrincipal) {
         boolean isRecommended = recommendQuestionService.isRecommended(questionId, userPrincipal.getId());
         return ResponseEntity.ok(ApiUtils.success(Map.of("recommended", isRecommended)));
     }

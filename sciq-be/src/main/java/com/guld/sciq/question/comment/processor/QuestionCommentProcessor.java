@@ -19,11 +19,13 @@ public class QuestionCommentProcessor {
     private final QuestionCommentRepository questionCommentRepository;
     private final UserService userService;
 
-    public QuestionCommentDto createComment(QuestionCommentCreateDto createDto, Long questionId, Long userId) {
+    public QuestionCommentDto createComment(QuestionCommentCreateDto createDto, Long questionId, Long userId, String userNickName) {
         QuestionComment comment = QuestionComment.builder()
                 .content(createDto.content())
                 .question(Question.builder().id(questionId).build())
                 .userId(userId)
+                .userNickName(userNickName)
+                .likeCnt(0)
                 .build();
         
         return QuestionCommentDto.from(questionCommentRepository.save(comment));

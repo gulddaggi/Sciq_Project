@@ -42,8 +42,29 @@ public class QuestionController {
 
     @Operation(summary = "질문 목록 조회", description = "모든 질문 목록을 조회합니다.")
     @GetMapping
-    public ResponseEntity<?> getAllQuestions() {
-        return ResponseEntity.ok(ApiUtils.success(questionService.getAllQuestions()));
+    public ResponseEntity<?> getAllQuestions(
+            @RequestParam(defaultValue = "latest") String sort) {
+        if ("recommend".equals(sort)) {
+            // 인기순 정렬
+            return ResponseEntity.ok(ApiUtils.success(questionService.getAllQuestionsSortedByRecommendCount()));
+        } else {
+            // 기본은 최신순 정렬
+            return ResponseEntity.ok(ApiUtils.success(questionService.getAllQuestionsSortedByLatest()));
+        }
+    }
+
+    @Operation(summary = "인기 질문 목록 조회", description = "인기 질문 목록을 조회합니다.")
+    @GetMapping("/popular")
+    public ResponseEntity<?> getPopularQuestions(
+            @RequestParam(defaultValue = "10") int limit) {
+        return ResponseEntity.ok(ApiUtils.success(questionService.getTopRatedQuestions(limit)));
+    }
+
+    @Operation(summary = "최신 질문 목록 조회", description = "최신 질문 목록을 조회합니다.")
+    @GetMapping("/recent")
+    public ResponseEntity<?> getRecentQuestions(
+            @RequestParam(defaultValue = "10") int limit) {
+        return ResponseEntity.ok(ApiUtils.success(questionService.getRecentQuestions(limit)));
     }
 
     @Operation(summary = "질문 수정", description = "기존 질문을 수정합니다.")

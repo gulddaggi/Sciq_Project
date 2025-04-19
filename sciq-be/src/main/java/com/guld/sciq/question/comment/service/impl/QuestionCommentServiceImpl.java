@@ -48,8 +48,9 @@ public class QuestionCommentServiceImpl implements QuestionCommentService {
 
     @Override
     @Transactional
-    public void likeComment(Long commentId, Long userId) {
+    public QuestionCommentDto likeComment(Long commentId, Long userId) {
         questionCommentProcessor.likeComment(commentId, userId);
+        return questionCommentProcessor.getComment(commentId);
     }
 
     @Override
@@ -61,7 +62,6 @@ public class QuestionCommentServiceImpl implements QuestionCommentService {
                 .collect(Collectors.toList());
     }
 
-    @Override
     @Transactional(readOnly = true)
     public List<QuestionCommentDto> getCommentsByUser(Long userId) {
         return questionCommentRepository.findByUserId(userId)

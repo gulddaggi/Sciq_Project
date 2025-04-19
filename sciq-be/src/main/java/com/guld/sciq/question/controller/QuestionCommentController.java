@@ -28,7 +28,7 @@ public class QuestionCommentController {
             @RequestBody QuestionCommentCreateDto createDto,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
         return ResponseEntity.ok(ApiUtils.success(
-            questionCommentService.createComment(createDto, questionId, userPrincipal.getId())));
+            questionCommentService.createComment(createDto, questionId, userPrincipal.getId(), userPrincipal.getNickName())));
     }
 
     @Operation(summary = "댓글 조회", description = "특정 댓글을 조회합니다.")

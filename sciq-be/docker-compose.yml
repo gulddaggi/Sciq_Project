@@ -7,29 +7,42 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - /home/ubuntu/sciq-be/app.jar:/app.jar
-    command: ["java", "-jar", "/app.jar"]
-    restart: always
+      - ./app.jar:/app.jar
+      - ./.env:/app/.env
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://sciq-mysql:3306/sciq
-      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/sciq?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
+    env_file:
+      - .env
+    command: ["java", "-jar", "/app.jar"]
+    depends_on:
+      - db
+    restart: always
     networks:
       - sciq-network
 
   db:
     image: mysql:8.0
     container_name: sciq-mysql
+    env_file:
+      - .env
     environment:
-      MYSQL_ROOT_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-      MYSQL_DATABASE: sciq
-      MYSQL_USER: ${SPRING_DATASOURCE_USERNAME}
-      MYSQL_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      - MYSQL_DATABASE=sciq
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - sciq-network
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci

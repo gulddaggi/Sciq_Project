@@ -72,13 +72,13 @@ jobs:
           ls -la sciq-be/sciq-be.zip
           unzip -l sciq-be/sciq-be.zip
 
-      - name: Copy to EC2
+      - name: Copy files to EC2
         uses: appleboy/scp-action@v0.1.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "sciq-be/sciq-be.zip"
+          source: "sciq-be/sciq-be.zip,sciq-be/.env"
           target: "/home/ubuntu"
           strip_components: 1
 
@@ -89,16 +89,17 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Debug: Check if zip exists
-            echo "Checking for zip file:"
+            # Debug: Check if files exist
+            echo "Checking for files:"
             ls -la ~/sciq-be.zip
+            ls -la ~/.env
             
             # Clean up old files
             rm -rf ~/sciq-be
             mkdir -p ~/sciq-be
             
-            # Copy .env file
-            cp .env ~/sciq-be/.env
+            # Move .env file
+            mv ~/.env ~/sciq-be/.env
             
             # Unzip and check contents
             cd ~/sciq-be

@@ -34,7 +34,7 @@ springdoc:
     disable-swagger-default-url: true
     config-url: /v3/api-docs/swagger-config
     url: /v3/api-docs
-  paths-to-match: /api/**
+  paths-to-match: /v1/**
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
 

@@ -77,18 +77,22 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # Clean up old files
             rm -rf ~/sciq-be
-            mkdir -p ~/sciq-be
-            unzip -o ~/sciq-be.zip -d ~/sciq-be
-            cd ~/sciq-be
+            rm -f ~/sciq-be.zip
             
-            # Debug: List contents to verify JAR location
+            # Create directory and unzip
+            mkdir -p ~/sciq-be
+            mv sciq-be/sciq-be.zip ~/sciq-be.zip
+            cd ~/sciq-be
+            unzip -o ../sciq-be.zip
+            
+            # Debug: List contents
+            echo "Current directory contents:"
             ls -la
             
-            # Rename JAR to app.jar for consistency
-            mv *.jar app.jar
-
-            echo '
+            echo "Creating docker-compose.yml with proper environment variables"
+            cat << 'EOF' > docker-compose.yml
             version: "3.8"
             services:
               app:
@@ -101,9 +105,9 @@ jobs:
                 environment:
                   - SPRING_PROFILES_ACTIVE=prod
                   - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/sciq
-                  - SPRING_DATASOURCE_USERNAME=${{ secrets.MYSQL_USER }}
-                  - SPRING_DATASOURCE_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
-                  - JWT_SECRET=${{ secrets.JWT_SECRET }}
+                  - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
+                  - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+                  - JWT_SECRET=${JWT_SECRET}
                 command: ["java", "-jar", "/app.jar"]
                 depends_on:
                   - db
@@ -112,10 +116,10 @@ jobs:
                 image: mysql:8.0
                 container_name: sciq-mysql
                 environment:
-                  MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+                  MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
                   MYSQL_DATABASE: sciq
-                  MYSQL_USER: ${{ secrets.MYSQL_USER }}
-                  MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+                  MYSQL_USER: ${MYSQL_USER}
+                  MYSQL_PASSWORD: ${MYSQL_PASSWORD}
                 ports:
                   - "3306:3306"
                 volumes:
@@ -127,17 +131,24 @@ jobs:
                   retries: 5
             volumes:
               mysql-data:
-            ' > docker-compose.yml
-
-            # Debug: Check if app.jar exists
-            ls -la app.jar
+            EOF
+            
+            # Export environment variables
+            export MYSQL_ROOT_PASSWORD='${{ secrets.MYSQL_ROOT_PASSWORD }}'
+            export MYSQL_USER='${{ secrets.MYSQL_USER }}'
+            export MYSQL_PASSWORD='${{ secrets.MYSQL_PASSWORD }}'
+            export JWT_SECRET='${{ secrets.JWT_SECRET }}'
+            
+            # Replace environment variables in docker-compose.yml
+            envsubst < docker-compose.yml > docker-compose.tmp
+            mv docker-compose.tmp docker-compose.yml
             
             # Stop and remove existing containers
             sudo docker-compose down
             sudo docker stop sciq-mysql sciq-backend || true
             sudo docker rm sciq-mysql sciq-backend || true
             
-            # Start services with logs
+            # Start services
             sudo docker-compose up -d
             
             # Show logs for debugging

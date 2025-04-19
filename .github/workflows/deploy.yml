@@ -124,6 +124,12 @@ jobs:
                 volumes:
                   - ./app.jar:/app.jar
                   - ./.env:/app/.env
+                environment:
+                  - SPRING_PROFILES_ACTIVE=prod
+                  - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/sciq?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+                  - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
+                  - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+                  - JWT_SECRET=${JWT_SECRET}
                 env_file:
                   - .env
                 command: ["java", "-jar", "/app.jar"]
@@ -135,6 +141,8 @@ jobs:
                 container_name: sciq-mysql
                 env_file:
                   - .env
+                environment:
+                  - MYSQL_DATABASE=sciq
                 ports:
                   - "3306:3306"
                 volumes:

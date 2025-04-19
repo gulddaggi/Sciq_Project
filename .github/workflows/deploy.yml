@@ -57,9 +57,20 @@ jobs:
         run: ./gradlew clean bootJar
         working-directory: sciq-be
 
+      - name: Debug list files
+        run: ls -la sciq-be/build/libs/
+        
       - name: Zip JAR
-        run: zip -j sciq-be.zip build/libs/*.jar
-        working-directory: sciq-be
+        run: |
+          cd sciq-be/build/libs/
+          zip -j sciq-be.zip *.jar
+          mv sciq-be.zip ../../
+        
+      - name: Debug check zip
+        run: |
+          echo "Checking zip file existence and content:"
+          ls -la sciq-be/sciq-be.zip
+          unzip -l sciq-be/sciq-be.zip
 
       - name: Copy to EC2
         uses: appleboy/scp-action@v0.1.3
@@ -68,7 +79,8 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "sciq-be/sciq-be.zip"
-          target: "~/"
+          target: "/home/ubuntu"
+          strip_components: 1
 
       - name: Deploy on EC2 via SSH
         uses: appleboy/ssh-action@v0.1.10
@@ -77,21 +89,26 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # Debug: Check if zip exists
+            echo "Checking for zip file:"
+            ls -la ~/sciq-be.zip
+            
             # Clean up old files
             rm -rf ~/sciq-be
-            rm -f ~/sciq-be.zip
-            
-            # Create directory and unzip
             mkdir -p ~/sciq-be
-            mv sciq-be/sciq-be.zip ~/sciq-be.zip
+            
+            # Unzip and check contents
             cd ~/sciq-be
             unzip -o ../sciq-be.zip
-            
-            # Debug: List contents
-            echo "Current directory contents:"
+            echo "Checking contents after unzip:"
             ls -la
             
-            echo "Creating docker-compose.yml with proper environment variables"
+            # Ensure JAR file is named correctly
+            mv *.jar app.jar || echo "Failed to rename JAR file"
+            echo "Checking final JAR file:"
+            ls -la app.jar
+            
+            # Create docker-compose.yml
             cat << 'EOF' > docker-compose.yml
             version: "3.8"
             services:
@@ -144,7 +161,7 @@ jobs:
             mv docker-compose.tmp docker-compose.yml
             
             # Stop and remove existing containers
-            sudo docker-compose down
+            sudo docker-compose down || true
             sudo docker stop sciq-mysql sciq-backend || true
             sudo docker rm sciq-mysql sciq-backend || true
             

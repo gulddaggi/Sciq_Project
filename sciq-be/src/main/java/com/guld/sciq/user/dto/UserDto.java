@@ -2,6 +2,7 @@ package com.guld.sciq.user.dto;
 
 import com.guld.sciq.user.entity.User;
 import com.guld.sciq.user.entity.UserPrefer;
+import com.guld.sciq.user.entity.UserRole;
 
 public record UserDto(
     Long id,
@@ -11,7 +12,8 @@ public record UserDto(
     String schoolName,
     UserPrefer prefer,
     int points,
-    int level
+    int level,
+    UserRole role
 ) {
     public static UserDto from(User user) {
         return new UserDto(
@@ -22,7 +24,8 @@ public record UserDto(
             user.getSchoolName(),
             user.getPrefer(),
             user.getPoints(),
-            user.getLevel()
+            user.getLevel(),
+            user.getRole()
         );
     }
 
@@ -50,7 +53,8 @@ public record UserDto(
         String schoolName,
         UserPrefer prefer,
         int points,
-        int level
+        int level,
+        UserRole role
     ) {
         public static Response from(User user) {
             return new Response(
@@ -61,7 +65,8 @@ public record UserDto(
                 user.getSchoolName(),
                 user.getPrefer(),
                 user.getPoints(),
-                user.getLevel()
+                user.getLevel(),
+                user.getRole()
             );
         }
     }

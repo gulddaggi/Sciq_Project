@@ -1,31 +1,33 @@
-version: '3.8'
+version: "3.8"
 
 services:
   app:
-    build: .
+    image: eclipse-temurin:17-jre
     container_name: sciq-backend
     ports:
       - "8080:8080"
-    depends_on:
-      - sciq-mysql
+    volumes:
+      - /home/ubuntu/sciq-be/app.jar:/app.jar
+    command: ["java", "-jar", "/app.jar"]
+    restart: always
     environment:
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_URL=jdbc:mysql://sciq-mysql:3306/sciq
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
-      - SERVER_PORT=8080
     networks:
       - sciq-network
-    restart: always
 
-  sciq-mysql:
+  db:
     image: mysql:8.0
     container_name: sciq-mysql
-    ports:
-      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       MYSQL_DATABASE: sciq
+      MYSQL_USER: ${SPRING_DATASOURCE_USERNAME}
+      MYSQL_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    ports:
+      - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     networks:

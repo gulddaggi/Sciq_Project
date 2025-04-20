@@ -52,7 +52,9 @@ pnpm-debug.log*
 # =============================
 # Environment & Configuration
 # =============================
+.env
 .env.*
+!.env.example
 
 # =============================
 # Docker

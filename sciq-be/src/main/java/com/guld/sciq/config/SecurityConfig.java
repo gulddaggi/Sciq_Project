@@ -95,7 +95,9 @@ public class SecurityConfig {
         // 프로덕션 프론트엔드 URL 설정
         configuration.setAllowedOriginPatterns(java.util.List.of(
             "https://sciq.co.kr",
-            "https://www.sciq.co.kr"
+            "https://www.sciq.co.kr",
+            "https://*.amazonaws.com",  // S3 호스팅 URL
+            "http://localhost:*"        // 로컬 개발 환경
         ));
         
         // 모든 HTTP 메서드 허용

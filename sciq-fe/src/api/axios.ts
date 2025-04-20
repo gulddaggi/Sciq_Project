@@ -1,13 +1,8 @@
 import axios from 'axios';
 import type { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
-// 환경에 따른 baseURL 설정
-const baseURL = import.meta.env.PROD 
-  ? '/api'  // 프로덕션 환경
-  : 'http://api.sciq.co.kr/api';  // 개발 환경
-
 const instance = axios.create({
-  baseURL,
+  baseURL: 'https://api.sciq.co.kr',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -28,24 +23,9 @@ instance.interceptors.request.use(
       delete config.headers['Content-Type'];
     }
     
-    // 개발 환경에서만 로깅
-    if (import.meta.env.DEV) {
-      console.log('=== 요청 상세 정보 ===');
-      console.log('전체 URL:', `${config.baseURL}${config.url}`);
-      console.log('요청 메서드:', config.method?.toUpperCase());
-      console.log('요청 헤더:', config.headers);
-      if (config.data) {
-        console.log('요청 데이터:', config.data);
-      }
-      console.log('==================');
-    }
-    
     return config;
   },
   (error: AxiosError) => {
-    if (import.meta.env.DEV) {
-      console.error('요청 에러:', error);
-    }
     return Promise.reject(error);
   }
 );
@@ -53,28 +33,9 @@ instance.interceptors.request.use(
 // 응답 인터셉터
 instance.interceptors.response.use(
   (response: AxiosResponse) => {
-    // 개발 환경에서만 로깅
-    if (import.meta.env.DEV) {
-      console.log('=== 응답 상세 정보 ===');
-      console.log('응답 상태:', response.status);
-      console.log('응답 URL:', response.config.url);
-      console.log('응답 데이터:', response.data);
-      console.log('==================');
-    }
     return response;
   },
-  async (error: AxiosError) => {
-    // 개발 환경에서만 상세 로깅
-    if (import.meta.env.DEV) {
-      console.error('=== 응답 에러 상세 정보 ===');
-      console.error('에러 메시지:', error.message);
-      if (error.response) {
-        console.error('에러 상태:', error.response.status);
-        console.error('에러 데이터:', error.response.data);
-      }
-      console.error('==================');
-    }
-    
+  async (error: AxiosError) => {    
     // 401 에러 처리 (인증 실패)
     if (error.response?.status === 401) {
       const refreshToken = localStorage.getItem('refreshToken');
@@ -96,16 +57,6 @@ instance.interceptors.response.use(
         localStorage.removeItem('tokenExpiresIn');
         window.location.href = '/login';
       }
-    }
-    
-    // 404 에러 처리
-    if (error.response?.status === 404) {
-      console.error('요청한 리소스를 찾을 수 없습니다:', error.config?.url || '알 수 없는 URL');
-    }
-    
-    // 500 에러 처리
-    if (error.response?.status === 500) {
-      console.error('서버 에러가 발생했습니다.');
     }
     
     return Promise.reject(error);

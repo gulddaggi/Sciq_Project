@@ -168,4 +168,4 @@ jobs:
             echo "Backend logs:"
             sudo docker logs sciq-backend
             echo "MySQL logs:"
-            sudo docker logs sciq-mysql
+            sudo docker logs sciq-mysql 

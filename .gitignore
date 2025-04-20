@@ -65,5 +65,4 @@ Dockerfile
 # Miscellaneous
 # =============================
 *.swp
-*~
-
+*~ 

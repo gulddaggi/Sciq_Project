@@ -28,7 +28,7 @@ public class SwaggerConfig {
                                 .bearerFormat("JWT")))
                 .addSecurityItem(new SecurityRequirement().addList("Bearer"))
                 .servers(List.of(
-                        new Server().url("https://api.sciq.co.kr").description("Production server")));
+                        new Server().url("/api").description("Current server")));
     }
 }
 

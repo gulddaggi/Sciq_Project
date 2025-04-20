@@ -7,10 +7,7 @@
       <p>성별: {{ user.gender === 'MALE' ? '남성' : '여성' }}</p>
       <p>가입일: {{ new Date(user.createdAt).toLocaleDateString() }}</p>
     </div>
-    <div class="button-group">
-      <button @click="goToMyPage">마이페이지</button>
-      <button @click="goToProfile">프로필 수정</button>
-    </div>
+    <button @click="goToProfile">프로필 수정</button>
   </div>
 </template>
 
@@ -37,10 +34,6 @@ onMounted(async () => {
 const goToProfile = () => {
   router.push('/profile')
 }
-
-const goToMyPage = () => {
-  router.push('/mypage')
-}
 </script>
 
 <style scoped>
@@ -54,13 +47,8 @@ const goToMyPage = () => {
   margin-bottom: 20px;
 }
 
-.button-group {
-  display: flex;
-  gap: 10px;
-}
-
 button {
-  flex: 1;
+  width: 100%;
   padding: 10px;
   background-color: var(--primary-color);
   color: white;

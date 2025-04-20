@@ -36,7 +36,9 @@ interface ApiResponse<T> {
 
 // axios 인스턴스 생성
 const instance = axios.create({
-  baseURL: 'https://api.sciq.co.kr',
+  baseURL: import.meta.env.PROD 
+    ? '/api'  // 프로덕션 환경
+    : 'http://api.sciq.co.kr/api',  // 개발 환경
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'

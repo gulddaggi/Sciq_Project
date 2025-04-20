@@ -51,11 +51,6 @@ const handleLogout = () => {
         <span>홈</span>
       </router-link>
       
-      <router-link v-if="isAuthenticated" to="/mypage" class="menu-item" @click="onClose">
-        <span class="material-icons">person</span>
-        <span>마이페이지</span>
-      </router-link>
-      
       <router-link to="/board" class="menu-item" @click="onClose">
         <span class="material-icons">article</span>
         <span>게시판</span>

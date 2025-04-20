@@ -92,12 +92,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // 프로덕션 프론트엔드 URL 설정
+        // 프론트엔드 URL 설정
         configuration.setAllowedOriginPatterns(java.util.List.of(
-            "https://sciq.co.kr",
-            "https://www.sciq.co.kr",
-            "https://*.amazonaws.com",  // S3 호스팅 URL
-            "http://localhost:*"        // 로컬 개발 환경
+            "http://localhost:5173",
+            "http://localhost:8080",
+            "http://www.sciq.co.kr",
+            "http://api.sciq.co.kr"
         ));
         
         // 모든 HTTP 메서드 허용

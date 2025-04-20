@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 const instance = axios.create({
-  baseURL: 'https://api.sciq.co.kr/api',
+  baseURL: `${import.meta.env.VITE_API_BASE_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },

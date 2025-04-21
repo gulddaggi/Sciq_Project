@@ -181,7 +181,7 @@ export default instance;
 
 // 함수 export 추가
 export const login = async (data: { email: string; password: string }) => {
-  const res = await instance.post<ApiResponse<TokenDto>>('/auth/login', data);
+  const res = await instance.post<ApiResponse<TokenDto>>('/api/auth/login', data);
   // Store tokens after successful login
   localStorage.setItem('accessToken', res.data.data.accessToken);
   localStorage.setItem('refreshToken', res.data.data.refreshToken);
@@ -191,16 +191,16 @@ export const login = async (data: { email: string; password: string }) => {
 
 export const register = async (data: RegisterRequest) => {
   console.log('API 요청 데이터:', data);
-  const response = await instance.post<ApiResponse<TokenDto>>('/auth/signup', data);
+  const response = await instance.post<ApiResponse<TokenDto>>('/api/auth/signup', data);
   console.log('API 응답:', response.data);
   return response.data.data;
 };
 
 export const reissue = async (refreshToken: string) => {
-  const res = await instance.post<ApiResponse<TokenDto>>('/auth/reissue', { refreshToken });
+  const res = await instance.post<ApiResponse<TokenDto>>('/api/auth/reissue', { refreshToken });
   return res.data.data;
 };
 
 export const logout = async (refreshToken: string) => {
-  await instance.post<ApiResponse<void>>('/auth/logout', { refreshToken });
+  await instance.post<ApiResponse<void>>('/api/auth/logout', { refreshToken });
 };

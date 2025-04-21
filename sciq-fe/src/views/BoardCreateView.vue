@@ -14,38 +14,17 @@ const contentError = ref('')
 const scienceDisciplines = [
   { value: 'PHYSICS', label: '물리학' },
   { value: 'CHEMISTRY', label: '화학' },
-  { value: 'BIOLOGY', label: '생물학' },
-  { value: 'MATHEMATICS', label: '수학' },
-  { value: 'COMPUTER_SCIENCE', label: '컴퓨터 과학' },
-  { value: 'ASTRONOMY', label: '천문학' },
-  { value: 'GEOLOGY', label: '지질학' },
-  { value: 'ENVIRONMENTAL_SCIENCE', label: '환경 과학' }
+  { value: 'BIOLOGY', label: '생명과학' },
+  { value: 'EARTH_SCIENCE', label: '지구과학' },
+  { value: 'ASTRONOMY', label: '천문학' }
 ]
-
-// 문자열의 바이트 수 계산
-const getByteLength = (str: string) => {
-  let byteLength = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    if (char <= 0x7F) { // ASCII 문자
-      byteLength += 1;
-    } else if (char <= 0x7FF) { // 2바이트 문자
-      byteLength += 2;
-    } else if (char <= 0xFFFF) { // 3바이트 문자 (한글 등)
-      byteLength += 3;
-    } else { // 4바이트 문자
-      byteLength += 4;
-    }
-  }
-  return byteLength;
-}
 
 // 제목 입력 시 실시간 검사
 const checkTitleLength = () => {
-  const titleByteLength = getByteLength(title.value);
-  if (titleByteLength > 100) {
-    titleError.value = '제목은 100바이트 이하로 입력해주세요.'
-  } else if (titleByteLength < 6) {
+  const titleLength = title.value.length;
+  if (titleLength > 100) {
+    titleError.value = '제목은 100자 이하로 입력해주세요.'
+  } else if (titleLength < 2) {
     titleError.value = '제목은 2자 이상 입력해주세요.'
   } else {
     titleError.value = ''
@@ -54,11 +33,9 @@ const checkTitleLength = () => {
 
 // 본문 내용 입력 시 실시간 검사
 const checkContentLength = () => {
-  const contentByteLength = getByteLength(content.value);
-  if (contentByteLength > 1000) {
-    contentError.value = '내용은 1000바이트 이하로 입력해주세요.'
-  } else if (contentByteLength < 30) {
-    contentError.value = '내용은 10자 이상 입력해주세요.'
+  const contentLength = content.value.length;
+  if (contentLength > 1000) {
+    contentError.value = '내용은 1000자 이하로 입력해주세요.'
   } else {
     contentError.value = ''
   }
@@ -67,26 +44,23 @@ const checkContentLength = () => {
 const validateForm = () => {
   let isValid = true
   
-  const titleByteLength = getByteLength(title.value);
-  const contentByteLength = getByteLength(content.value);
+  const titleLength = title.value.length;
+  const contentLength = content.value.length;
   
-  // 제목 유효성 검사 (100바이트 제한)
-  if (titleByteLength < 6) { // 최소 2글자 (한글 기준)
+  // 제목 유효성 검사 (100자 제한)
+  if (titleLength < 2) {
     titleError.value = '제목은 2자 이상 입력해주세요.'
     isValid = false
-  } else if (titleByteLength > 100) {
-    titleError.value = '제목은 100바이트 이하로 입력해주세요.'
+  } else if (titleLength > 100) {
+    titleError.value = '제목은 100자 이하로 입력해주세요.'
     isValid = false
   } else {
     titleError.value = ''
   }
 
-  // 내용 유효성 검사 (1000바이트 제한)
-  if (contentByteLength < 30) { // 최소 10글자 (한글 기준)
-    contentError.value = '내용은 10자 이상 입력해주세요.'
-    isValid = false
-  } else if (contentByteLength > 1000) {
-    contentError.value = '내용은 1000바이트 이하로 입력해주세요.'
+  // 내용 유효성 검사 (1000자 제한)
+  if (contentLength > 1000) {
+    contentError.value = '내용은 1000자 이하로 입력해주세요.'
     isValid = false
   } else {
     contentError.value = ''
@@ -158,7 +132,7 @@ const handleCancel = () => {
       />
       <div class="char-count">
         <div class="count-info">
-          <span>{{ getByteLength(title) }}/100 바이트</span>
+          <span>{{ title.length }}/100</span>
           <span v-if="titleError" class="error-message">{{ titleError }}</span>
         </div>
       </div>
@@ -174,7 +148,7 @@ const handleCancel = () => {
       ></textarea>
       <div class="char-count">
         <div class="count-info">
-          <span>{{ getByteLength(content) }}/1000 바이트</span>
+          <span>{{ content.length }}/1000</span>
           <span v-if="contentError" class="error-message">{{ contentError }}</span>
         </div>
       </div>

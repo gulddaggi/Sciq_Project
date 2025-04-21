@@ -3,7 +3,8 @@ export enum ScienceDisciplineType {
   CHEMISTRY = 'CHEMISTRY',
   BIOLOGY = 'BIOLOGY',
   EARTH_SCIENCE = 'EARTH_SCIENCE',
-  ASTRONOMY = 'ASTRONOMY'
+  ASTRONOMY = 'ASTRONOMY',
+  DEFAULT = 'DEFAULT'
 }
 
 export interface ApiResponse<T> {

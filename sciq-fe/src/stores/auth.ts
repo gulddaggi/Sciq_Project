@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { register as apiRegister, login as apiLogin, type RegisterRequest, type TokenDto, type LoginRequest } from '../api/auth'
 import router from '../router'
 import axios from '../api/axios'
@@ -13,7 +13,6 @@ export interface User {
   prefer: string
   points: number
   level: number
-  role?: string       // 백엔드에서 반환된 사용자 역할
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -126,17 +125,6 @@ export const useAuthStore = defineStore('auth', () => {
     router.push('/login')
   }
 
-  // 사용자 역할 정보 가져오기
-  const getUserRole = () => {
-    if (!user.value) return null
-    return user.value.role
-  }
-
-  // 어드바이저 여부 확인
-  const isAdvisor = computed(() => {
-    return user.value?.role === 'ROLE_ADVISOR'
-  })
-
   return {
     user,
     token,
@@ -147,8 +135,6 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     logout,
     initializeAuth,
-    getCurrentUser,
-    getUserRole,     // 사용자 역할 정보 반환 함수 추가
-    isAdvisor        // 어드바이저 여부 확인 computed 속성 추가
+    getCurrentUser
   }
 }) 

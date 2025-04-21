@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { postService } from '@/api/postService'
 
 interface Post {
@@ -18,12 +18,24 @@ interface Post {
 }
 
 const router = useRouter()
+const route = useRoute()
 const posts = ref<Post[]>([])
 const isLoading = ref(false)
 const currentPage = ref(1)
 const totalPages = ref(1)
 const sortBy = ref<'latest' | 'recommend'>('latest')
 const searchQuery = ref('')
+
+const formatDiscipline = (discipline: string) => {
+  const disciplineMap: { [key: string]: string } = {
+    'PHYSICS': '물리학',
+    'CHEMISTRY': '화학',
+    'BIOLOGY': '생명과학',
+    'EARTH_SCIENCE': '지구과학',
+    'ASTRONOMY': '천문학'
+  }
+  return disciplineMap[discipline] || discipline
+}
 
 const fetchPosts = async () => {
   isLoading.value = true
@@ -63,6 +75,9 @@ const handleSortChange = (event: Event) => {
   const select = event.target as HTMLSelectElement
   sortBy.value = select.value as 'latest' | 'recommend'
   currentPage.value = 1
+  router.replace({
+    query: { ...route.query, sort: sortBy.value }
+  })
   fetchPosts()
 }
 
@@ -80,6 +95,10 @@ const goToDetail = (id: number) => {
 }
 
 onMounted(() => {
+  const urlSort = route.query.sort as string
+  if (urlSort === 'recommend' || urlSort === 'latest') {
+    sortBy.value = urlSort
+  }
   fetchPosts()
 })
 </script>
@@ -132,7 +151,7 @@ onMounted(() => {
         <div class="post-meta">
           <span class="author">{{ post.user.nickName }}</span>
           <span class="date">{{ new Date(post.createdAt).toLocaleDateString() }}</span>
-          <span class="discipline">{{ post.scienceDiscipline }}</span>
+          <span class="discipline">{{ formatDiscipline(post.scienceDiscipline) }}</span>
           <span class="recommend">
             <span class="material-icons">favorite</span>
             {{ post.recommendCnt }}

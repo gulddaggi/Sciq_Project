@@ -138,7 +138,7 @@ const form = reactive<RegisterRequest>({
   userName: '',
   nickName: '',
   schoolName: '',
-  prefer: 'NONE',
+  prefer: 'PHYSICS',
   userRole: 'ROLE_STUDENT'
 })
 
@@ -159,8 +159,7 @@ const scienceDisciplineOptions = [
   { value: 'CHEMISTRY', label: '화학' },
   { value: 'BIOLOGY', label: '생물학' },
   { value: 'EARTH_SCIENCE', label: '지구과학' },
-  { value: 'ASTRONOMY', label: '천문학' },
-  { value: 'NONE', label: '선호사항 없음' }
+  { value: 'ASTRONOMY', label: '천문학' }
 ]
 
 const roleOptions = [

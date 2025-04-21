@@ -29,6 +29,18 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/profile/view',
+    name: 'ProfileView',
+    component: () => import('../pages/Profile/ProfileView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/profile/edit',
+    name: 'ProfileEdit',
+    component: () => import('../pages/Profile/ProfileEdit.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/user-info',
     name: 'user-info',
     component: () => import('../pages/UserInfo.vue'),
@@ -78,6 +90,12 @@ const routes: RouteRecordRaw[] = [
     path: '/posts/:id',
     name: 'post-detail',
     component: PostDetailView
+  },
+  {
+    path: '/questions/:id',
+    name: 'question-detail',
+    component: () => import('../views/QuestionDetailView.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 // 라우터 생성

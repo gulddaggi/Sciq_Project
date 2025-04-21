@@ -1,9 +1,9 @@
 import axios from './axios';
-import type { ApiResponse, Question, Comment, CommentCreateRequest, CommentUpdateRequest } from '@/types/board';
+import type { ApiResponse, Question, Comment, CommentCreateRequest, CommentUpdateRequest, QuestionUpdateRequest } from '@/types/board';
 import { ScienceDisciplineType } from '@/types/board';
 
 export interface QuestionListResponse {
-  questions: Question[];
+  content: Question[];
   totalPages: number;
   totalElements: number;
   size: number;
@@ -33,25 +33,37 @@ export const questionService = {
     }
   },
   
-  // 인기 질문 목록 조회
-  async getPopularQuestions() {
+  // 인기 게시글 조회 (좋아요순)
+  async getPopularQuestions(size: number = 3) {
     try {
-      const response = await axios.get<ApiResponse<QuestionListResponse>>('/v1/questions/popular');
-      return response.data;
+      const response = await axios.get<ApiResponse<Question[]>>('/api/v1/questions/popular', {
+        params: {
+          sort: 'recommendCnt,desc',
+          size: size,
+          page: 0
+        }
+      });
+      return response.data.data;
     } catch (error) {
-      console.error('인기 질문 조회 실패:', error);
-      throw error;
+      console.error('인기 게시글 조회 실패:', error);
+      return [];
     }
   },
 
-  // 최신 질문 목록 조회
-  async getRecentQuestions() {
+  // 최신 게시글 조회
+  async getRecentQuestions(size: number = 3) {
     try {
-      const response = await axios.get<ApiResponse<QuestionListResponse>>('/v1/questions/recent');
-      return response.data;
+      const response = await axios.get<ApiResponse<Question[]>>('/api/v1/questions/recent', {
+        params: {
+          sort: 'createdAt,desc',
+          size: size,
+          page: 0
+        }
+      });
+      return response.data.data;
     } catch (error) {
-      console.error('최신 질문 조회 실패:', error);
-      throw error;
+      console.error('최신 게시글 조회 실패:', error);
+      return [];
     }
   },
   
@@ -106,33 +118,35 @@ export const questionService = {
   },
   
   // 게시글 추천
-  async recommendQuestion(questionId: number) {
+  async recommendQuestion(questionId: number): Promise<ApiResponse<string>> {
     try {
-      // 토큰이 자동으로 axios 인스턴스를 통해 설정됩니다
-      // 토큰 유효성 검사는 인터셉터에서 수행됩니다
-      const response = await axios.post<ApiResponse<null>>(
-        `/v1/questions/${questionId}/recommend`,
-        null // 요청 본문 없음
-      );
-      
-      // 추천 성공 후 최신 게시글 정보를 다시 불러옴
-      const updatedQuestion = await this.getQuestion(questionId);
-      
-      return updatedQuestion;
+      const response = await axios.post<ApiResponse<string>>(`/v1/questions/${questionId}/recommend`);
+      return response.data;
     } catch (error) {
       console.error('게시글 추천 실패:', error);
       throw error;
     }
   },
-  
-  // 좋아요 상태 확인
-  async checkRecommendStatus(questionId: number) {
+
+  // 게시글 추천 취소
+  async unrecommendQuestion(questionId: number): Promise<ApiResponse<void>> {
     try {
-      const response = await axios.get<ApiResponse<{recommended: boolean}>>(`/v1/questions/${questionId}/recommend/status`);
+      const response = await axios.delete<ApiResponse<void>>(`/v1/questions/${questionId}/recommend`);
       return response.data;
     } catch (error) {
-      console.error('좋아요 상태 확인 실패:', error);
-      throw error;
+      console.error('추천 취소 실패:', error);
+      return { success: false, data: undefined, message: '추천 취소에 실패했습니다.' };
+    }
+  },
+
+  // 게시글 추천 상태 확인
+  async checkRecommendStatus(questionId: number): Promise<ApiResponse<boolean>> {
+    try {
+      const response = await axios.get<ApiResponse<boolean>>(`/v1/questions/${questionId}/recommend/status`);
+      return response.data;
+    } catch (error) {
+      console.error('추천 상태 확인 실패:', error);
+      return { success: false, data: false, message: '추천 상태 확인에 실패했습니다.' };
     }
   },
   
@@ -144,6 +158,29 @@ export const questionService = {
     } catch (error) {
       console.error('게시글 삭제 실패:', error);
       throw error;
+    }
+  },
+
+  // 게시글 수정
+  async updateQuestion(id: number, data: QuestionUpdateRequest) {
+    try {
+      const response = await axios.put<ApiResponse<Question>>(`/v1/questions/${id}`, data);
+      return response.data;
+    } catch (error) {
+      console.error('게시글 수정 실패:', error);
+      throw error;
+    }
+  },
+
+  // 사용자가 좋아요한 게시글 조회
+  async getRecommendedQuestionsByUser() {
+    try {
+      const response = await axios.get<ApiResponse<Question[]>>('/v1/mypage/recommended-questions');
+      console.log('좋아요한 게시글 응답:', response.data);
+      return response.data.data || [];
+    } catch (error) {
+      console.error('좋아요한 게시글 조회 실패:', error);
+      return [];
     }
   }
 }; 

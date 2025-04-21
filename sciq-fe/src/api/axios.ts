@@ -3,14 +3,15 @@ import type { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axio
 
 // 환경에 따른 baseURL 설정
 const baseURL = import.meta.env.PROD 
-  ? '/'  // 프로덕션 환경
-  : 'http://api.sciq.co.kr';  // 개발 환경
+  ? '/api'  // 프로덕션 환경 (/api로 설정하면 같은 도메인에서 요청)
+  : 'http://api.sciq.co.kr/api';  // 개발 환경
 
 const instance = axios.create({
   baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,  // CORS 요청에 쿠키 포함
   timeout: 60000,  // 60초
 });
 
@@ -31,12 +32,10 @@ instance.interceptors.request.use(
     // 개발 환경에서만 로깅
     if (import.meta.env.DEV) {
       console.log('=== 요청 상세 정보 ===');
-      console.log('전체 URL:', `${config.baseURL}${config.url}`);
+      console.log('전체 URL:', `${baseURL}${config.url}`);
       console.log('요청 메서드:', config.method?.toUpperCase());
-      console.log('요청 헤더:', config.headers);
-      if (config.data) {
-        console.log('요청 데이터:', config.data);
-      }
+      console.log('요청 헤더:', JSON.stringify(config.headers, null, 2));
+      console.log('요청 데이터:', JSON.stringify(config.data, null, 2));
       console.log('==================');
     }
     
@@ -44,7 +43,10 @@ instance.interceptors.request.use(
   },
   (error: AxiosError) => {
     if (import.meta.env.DEV) {
-      console.error('요청 에러:', error);
+      console.error('요청 에러:', error.message);
+      if (error.request) {
+        console.error('요청 객체:', error.request);
+      }
     }
     return Promise.reject(error);
   }
@@ -58,56 +60,32 @@ instance.interceptors.response.use(
       console.log('=== 응답 상세 정보 ===');
       console.log('응답 상태:', response.status);
       console.log('응답 URL:', response.config.url);
-      console.log('응답 데이터:', response.data);
+      console.log('응답 데이터:', JSON.stringify(response.data, null, 2));
       console.log('==================');
     }
     return response;
   },
-  async (error: AxiosError) => {
+  (error: AxiosError) => {
     // 개발 환경에서만 상세 로깅
     if (import.meta.env.DEV) {
       console.error('=== 응답 에러 상세 정보 ===');
       console.error('에러 메시지:', error.message);
+      console.error('에러 코드:', error.code);
       if (error.response) {
         console.error('에러 상태:', error.response.status);
-        console.error('에러 데이터:', error.response.data);
+        console.error('에러 데이터:', JSON.stringify(error.response.data, null, 2));
+        console.error('에러 헤더:', JSON.stringify(error.response.headers, null, 2));
+      } else if (error.request) {
+        console.error('요청은 성공했으나 응답이 없음:', error.request);
       }
       console.error('==================');
     }
     
-    // 401 에러 처리 (인증 실패)
     if (error.response?.status === 401) {
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (refreshToken) {
-        try {
-          // auth.ts의 reissue 함수를 직접 호출하지 않고 
-          // 401 에러는 auth.ts의 인터셉터에서 처리하도록 함
-          return Promise.reject(error);
-        } catch (refreshError) {
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-          localStorage.removeItem('tokenExpiresIn');
-          window.location.href = '/login';
-          return Promise.reject(refreshError);
-        }
-      } else {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('tokenExpiresIn');
-        window.location.href = '/login';
-      }
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      window.location.href = '/login';
     }
-    
-    // 404 에러 처리
-    if (error.response?.status === 404) {
-      console.error('요청한 리소스를 찾을 수 없습니다:', error.config?.url || '알 수 없는 URL');
-    }
-    
-    // 500 에러 처리
-    if (error.response?.status === 500) {
-      console.error('서버 에러가 발생했습니다.');
-    }
-    
     return Promise.reject(error);
   }
 );

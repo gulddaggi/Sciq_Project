@@ -38,8 +38,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // CORS 설정
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+        // CORS 설정 제거 (Nginx에서 처리)
+        http.cors(cors -> cors.disable());
+        // http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
         // CSRF 설정 Disable
         http.csrf(
@@ -89,6 +90,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /*
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -113,4 +115,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+    */
 }

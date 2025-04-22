@@ -85,13 +85,14 @@ public class QuestionController {
         // 추천한 경우에만 추천 받은 사용자에게 포인트 추가
         if (isRecommended) {
             // 게시글 작성자 ID 조회
-            Long authorId = questionService.getQuestion(questionId).getUserId();
+            var questionDto = questionService.getQuestion(questionId);
+            Long authorId = questionDto.user().id();
             
             // 게시물 추천 시 작성자에게 포인트 추가
             userPointService.addPointForPostRecommendation(authorId);
             
             // 추천 수 확인 후 마일스톤 달성 시 추가 포인트 부여
-            int recommendCount = questionService.getQuestion(questionId).getRecommendCnt();
+            int recommendCount = questionDto.recommendCnt();
             userPointService.addPointForRecommendationMilestone(authorId, recommendCount);
         }
         

@@ -30,6 +30,7 @@ public class QuestionCommentProcessor {
                 .build();
 
         QuestionComment savedComment = questionCommentRepository.save(comment);
+        
         QuestionCommentDto dto = QuestionCommentDto.from(savedComment);
         dto.setAdvisor(isAdvisor);
         return dto;

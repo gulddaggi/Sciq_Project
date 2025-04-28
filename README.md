@@ -3,7 +3,7 @@
 **과학 호기심 해결 커뮤니티 플랫폼**  
 🛠 *STDev Science Hackathon 2025 참가작*
 
-**[SciQ 사이트]((http://www.sciq.co.kr/)**
+**[SciQ 사이트](http://www.sciq.co.kr/)**
 ---
 
 ## 📚 프로젝트 개요
